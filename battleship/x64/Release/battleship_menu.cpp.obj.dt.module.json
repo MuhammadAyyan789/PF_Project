@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "battleship\\x64\\Release\\battleship_menu.obj",
+            "outputs": [
+                "battleship\\x64\\Release\\battleship_menu.cpp.obj.dt.module.json",
+                "battleship\\x64\\Release\\battleship_menu.cpp.obj.dt.d.json"
+            ],
+            "requires": []
+        }
+    ]
+}
