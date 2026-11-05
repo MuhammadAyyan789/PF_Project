@@ -146,8 +146,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="battleship.cpp" />
+    <ClCompile Include="battleship_menu.cpp" />
     <ClCompile Include="menu.cpp" />
     <ClCompile Include="tutorial.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".gitignore" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
