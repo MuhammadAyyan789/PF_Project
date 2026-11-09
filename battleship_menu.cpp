@@ -132,6 +132,11 @@ int main()
     std::vector<sf::Sprite> bullets;
     sf::Clock shoot;
 
+    sf::Clock spawnship;
+    sf::Time spawnInterval = sf::seconds(4.0f);
+
+    float spawnNumbers = 4;
+
     while (window.isOpen())
     {
         float dt = clock.restart().asSeconds();
@@ -206,6 +211,8 @@ int main()
                 if (shoot.getElapsedTime().asSeconds() > 0.15f)
                 {
                     sf::Sprite newBullet(bullettexture);
+                    sf::FloatRect bulletBounds = newBullet.getGlobalBounds();
+
                     float bulletx = battleship.getPosition().x + (battleship.getGlobalBounds().size.x / 2.f) - 4.f;
                     float bullety = battleship.getPosition().y;
 
@@ -230,6 +237,15 @@ int main()
                     it++;
                 }
             }
+
+            // if(spawnship.getElapsedTime()>=spawnInterval)
+            // {
+            //     for(int i=0;i<spawnNumbers;i++)
+            //     {
+            //         SpawnEnemies(enemy,2000);
+            //     }
+            //     spawnship.restart();
+            // }
         }
 
         window.clear(sf::Color::Black);
@@ -252,8 +268,16 @@ int main()
                 window.draw(b);
             }
 
-
             enemy.sprite.move({ 0.f, enemy.speed });
+
+            if(spawnship.getElapsedTime()>=spawnInterval)
+            {
+                for(int i=0;i<spawnNumbers;i++)
+                {
+                    SpawnEnemies(enemy,2000);
+                }
+                spawnship.restart();
+            }
 
             if (enemy.sprite.getPosition().y > 1500.0f)
             {
