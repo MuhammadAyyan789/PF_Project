@@ -13,7 +13,7 @@ struct ENemy
     sf::Sprite sprite;
     float speed = 150.0f; // Pixels per second
 
-    ENemy(const sf::Texture& texture) : sprite(texture) {}
+    ENemy(const sf::Texture& texture) : sprite(texture) {};
 };
 
 void SpawnEnemies(ENemy& enemy, float windowWidth)
@@ -121,8 +121,19 @@ int main()
     else
     {
         Menu.setLooping(true);
-        Menu.setVolume(50.f);
+        Menu.setVolume(100.f);
         Menu.play();
+    }
+
+    sf::Music Game;
+    if(!Game.openFromFile("gameMusic.mp3"))
+    {
+        std::cout<<"Unable to load the game music\n";
+    }
+    else
+    {
+        Game.setLooping(true);
+        Game.setVolume(50.f);
     }
 
     //bullets buffer voice
@@ -145,7 +156,12 @@ int main()
     sf::Text text(F, "Welcome to the world of disaster", 70);
     text.setStyle(sf::Text::Bold | sf::Text::Italic);
     text.setFillColor(sf::Color::Red);
-    text.setPosition({ 500.f, 300.f });
+    text.setPosition({ 500.f, 200.f });
+
+    sf::Text selectmenu(F,"SELECT YOUR BATTLESHIP", 70);
+    selectmenu.setStyle(sf::Text::Bold);
+    selectmenu.setFillColor(sf::Color::Blue);
+    selectmenu.setPosition({550.f,250});
 
     //score
     int totalscore = 0;
@@ -159,9 +175,11 @@ int main()
         return -1;
     }
 
+    //images of background
     sf::Sprite backs(backimage);
     backs.setScale({ 1.6f, 1.5f });
 
+    //Startbutton
     sf::RectangleShape rectangle({200,80});
     rectangle.setPosition({870,890});
     rectangle.setFillColor(sf::Color::Black);
@@ -170,6 +188,7 @@ int main()
     startButton.setPosition({ 900.f, 900.f });
     startButton.setFillColor(sf::Color::Cyan);
 
+    //Selection Menu
     sf::RectangleShape rectangle1({650,80});
     rectangle1.setPosition({670,990});
     rectangle1.setFillColor(sf::Color::Black);
@@ -178,6 +197,7 @@ int main()
     Settings.setPosition({700.f,1000.f});
     Settings.setFillColor(sf::Color::Cyan);
 
+    //ExitButton
     sf::RectangleShape rectangle2({200,80});
     rectangle2.setPosition({870,1090});
     rectangle2.setFillColor(sf::Color::Black);
@@ -185,6 +205,15 @@ int main()
     sf::Text exitButton(F, "EXIT", 50);
     exitButton.setPosition({ 900.f, 1100.f });
     exitButton.setFillColor(sf::Color::Cyan);
+
+    //Return to Main Menu Option
+    sf::Text backOption(F,"Return",30);
+    backOption.setFillColor(sf::Color::Black);
+    backOption.setPosition({1750,200});
+
+    sf::RectangleShape returnBox({120,50});
+    returnBox.setPosition({1740,185});
+    returnBox.setFillColor(sf::Color::Red);
 
     enum Gamestate
     {
@@ -197,6 +226,7 @@ int main()
 
     sf::Clock clock;
     float speed = 400.f;
+
 
     // Bullet resources
     sf::Image bullet;
@@ -212,10 +242,10 @@ int main()
     high.setFillColor(sf::Color::Magenta);
     high.setPosition({50.f,260.f});
 
+        
     while (window.isOpen())
     {
         float dt = clock.restart().asSeconds();
-
         while (std::optional event = window.pollEvent())
         {
             if (event->is<sf::Event::Closed>())
@@ -238,11 +268,14 @@ int main()
                     {
                         currentstate = Gamestate::PLAYING;
                         Menu.stop();
+                        Game.play();
                     }
 
                     if(Settings.getGlobalBounds().contains(mousePos))
                     {
                         currentstate = Gamestate::SETTINGS;
+                        Game.stop();
+
                     }
 
                     if (exitButton.getGlobalBounds().contains(mousePos))
@@ -250,6 +283,26 @@ int main()
                         window.close();
                     }
                 }
+
+                if(currentstate == Gamestate::PLAYING)
+                {
+                    if(backOption.getGlobalBounds().contains(mousePos))
+                    {
+                        currentstate = Gamestate::MENU;
+                        Menu.play();
+                        Game.stop();
+                    }
+                }
+
+                if(currentstate == Gamestate::SETTINGS)
+                {
+                    if(backOption.getGlobalBounds().contains(mousePos))
+                    {
+                        currentstate = Gamestate::MENU;
+                        Menu.play();
+                    }
+                }
+
             }
         }
 
@@ -311,7 +364,7 @@ int main()
                 if (it->getGlobalBounds().findIntersection(enemy.sprite.getGlobalBounds()))
                 {
                     // score increment
-                    totalscore += 50;
+                    totalscore += 20;
                     scoreText.setString("Score: " + std::to_string(totalscore));
 
                     int highest = UpdatedHighestvalue(totalscore,highest_score);
@@ -338,6 +391,16 @@ int main()
             {
                 SpawnEnemies(enemy, 2000.0f);
             }
+
+            if(totalscore%1000==0)
+            {
+                enemy.speed++;
+            }
+
+            if(totalscore%1500==0)
+            {
+                speed++;
+            }
         }
 
         window.clear(sf::Color::Black);
@@ -356,6 +419,8 @@ int main()
         else if (currentstate == Gamestate::PLAYING)
         {
             window.draw(background);
+            window.draw(returnBox);
+            window.draw(backOption);
             window.draw(battleship);
             window.draw(enemy.sprite);
             for (const auto& b : bullets)
@@ -367,7 +432,9 @@ int main()
         }
         else if(currentstate == Gamestate::SETTINGS)
         {
-            
+            window.draw(returnBox);
+            window.draw(backOption);
+            window.draw(selectmenu);
         }
 
         window.display();
