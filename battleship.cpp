@@ -34,20 +34,20 @@ void SpawnEnemies(ENemy& enemy, float windowWidth)
 int loadHighest()
 {
     //initially load the highest value from the file to highest
-    int highest=0;
+    int highest = 0;
     const std::string filename("high.txt");
 
     std::ifstream FileIn(filename);
 
-    if(FileIn.is_open())
+    if (FileIn.is_open())
     {
-        FileIn>>highest;
+        FileIn >> highest;
         FileIn.close();
     }
 
     return highest;
 }
-int UpdatedHighestvalue(int current, int &high)
+int UpdatedHighestvalue(int current, int& high)
 {
     //modify the existing highest value in the file
 
@@ -62,7 +62,7 @@ int UpdatedHighestvalue(int current, int &high)
             FileOut << high;
             FileOut.close();
         }
-    }    
+    }
 
     return high;
 }
@@ -112,6 +112,24 @@ int main()
     battleship.setPosition({ 900.f, 1200.f });
     battleship.setScale({ 0.4f, 0.4f });
 
+    //Selection menu back image
+    sf::Texture select;
+    if(!select.loadFromFile("selection.jpeg"))
+    {
+        std::cout<<"Unable to load image";
+    }
+    sf::Sprite Image(select);
+    (void)Image.setScale({ 1.5f,1.9f });
+
+        //GameOver
+    sf::Texture over;
+    if(!over.loadFromFile("GameOver1.jpg"))
+    {
+        std::cout<<"Unable to load image";
+    }
+    sf::Sprite End(over);
+    End.setScale({1.9f,1.7f});
+
     // Background Audio
     sf::Music Menu;
     if (!Menu.openFromFile("back_music.mp3"))
@@ -126,9 +144,9 @@ int main()
     }
 
     sf::Music Game;
-    if(!Game.openFromFile("gameMusic.mp3"))
+    if (!Game.openFromFile("gameMusic.mp3"))
     {
-        std::cout<<"Unable to load the game music\n";
+        std::cout << "Unable to load the game music\n";
     }
     else
     {
@@ -138,38 +156,46 @@ int main()
 
     //bullets buffer voice
     sf::SoundBuffer bulletsound;
-    if(!bulletsound.loadFromFile("laserGun.mp3"))
+    if (!bulletsound.loadFromFile("laserGun.mp3"))
     {
-        std::cout<<"Unable to load buffer ";
+        std::cout << "Unable to load buffer ";
     }
-        sf::Sound sound(bulletsound);
-        sound.setVolume(100);
-    
+    sf::Sound sound(bulletsound);
+    sound.setVolume(100);
+
 
     // Font & Text
     sf::Font F;
-    if (!F.openFromFile("arial.ttf"))
+    if (!F.openFromFile("Style.ttf"))
     {
         std::cout << "Failed to load the text style\n";
     }
 
-    sf::Text text(F, "Welcome to the world of disaster", 70);
-    text.setStyle(sf::Text::Bold | sf::Text::Italic);
-    text.setFillColor(sf::Color::Red);
-    text.setPosition({ 500.f, 200.f });
+    sf::Font F1;
+    if(!F1.openFromFile("style1.ttf"))
+    {
+        std::cout<<"Failes to load the text style\n";
+    }
+    // sf::Text text(F, "Welcome to the world of disaster", 70);
+    // text.setStyle(sf::Text::Bold | sf::Text::Italic);
+    // text.setFillColor(sf::Color::Red);
+    // text.setPosition({ 500.f, 200.f });
 
-    sf::Text selectmenu(F,"SELECT YOUR BATTLESHIP", 70);
+    sf::Text selectmenu(F, "SELECT YOUR BATTLESHIP", 70);
     selectmenu.setStyle(sf::Text::Bold);
     selectmenu.setFillColor(sf::Color::Blue);
-    selectmenu.setPosition({550.f,250});
+    selectmenu.setPosition({ 550.f,250 });
 
     //score
     int totalscore = 0;
-    sf::Text scoreText(F, "Score: 0", 30);
+    sf::Text scoreText(F1, "Score: 0", 30);
     scoreText.setFillColor(sf::Color::Red);
     scoreText.setPosition({ 50.f, 200.f });
+    scoreText.setStyle(sf::Text::Bold | sf::Text::Italic);
+
+
     sf::Texture backimage;
-    if (!backimage.loadFromFile("menu_image.jpg"))
+    if (!backimage.loadFromFile("menu2.jpeg"))
     {
         std::cout << "Failed to load background image 'menu_image.jpg'\n";
         return -1;
@@ -177,55 +203,77 @@ int main()
 
     //images of background
     sf::Sprite backs(backimage);
-    backs.setScale({ 1.6f, 1.5f });
+    backs.setScale({ 1.6f, 1.8f });
 
     //Startbutton
-    sf::RectangleShape rectangle({200,80});
-    rectangle.setPosition({870,890});
-    rectangle.setFillColor(sf::Color::Black);
+    sf::RectangleShape rectangle({ 200,80 });
+    rectangle.setPosition({ 870,890 });
+    rectangle.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text startButton(F, "PLAY", 50);
-    startButton.setPosition({ 900.f, 900.f });
+    startButton.setPosition({ 915.f, 900.f });
     startButton.setFillColor(sf::Color::Cyan);
 
     //Selection Menu
-    sf::RectangleShape rectangle1({650,80});
-    rectangle1.setPosition({670,990});
-    rectangle1.setFillColor(sf::Color::Black);
+    sf::RectangleShape rectangle1({ 600,80 });
+    rectangle1.setPosition({ 670,990 });
+    rectangle1.setFillColor(sf::Color(40, 37, 68));
 
-    sf::Text Settings(F,"BATTLESHIP SELECTION",50);
-    Settings.setPosition({700.f,1000.f});
+    sf::Text Settings(F, "BATTLESHIP SELECTION", 50);
+    Settings.setPosition({ 730.f,1000.f });
     Settings.setFillColor(sf::Color::Cyan);
 
     //ExitButton
-    sf::RectangleShape rectangle2({200,80});
-    rectangle2.setPosition({870,1090});
-    rectangle2.setFillColor(sf::Color::Black);
+    sf::RectangleShape rectangle2({ 200,80 });
+    rectangle2.setPosition({ 870,1090 });
+    rectangle2.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text exitButton(F, "EXIT", 50);
-    exitButton.setPosition({ 900.f, 1100.f });
+    exitButton.setPosition({ 915.f, 1100.f });
     exitButton.setFillColor(sf::Color::Cyan);
 
     //Return to Main Menu Option
-    sf::Text backOption(F,"Return",30);
+    sf::Text backOption(F, "Return", 30);
     backOption.setFillColor(sf::Color::Black);
-    backOption.setPosition({1750,200});
+    backOption.setPosition({ 1750,200 });
 
-    sf::RectangleShape returnBox({120,50});
-    returnBox.setPosition({1740,185});
+    sf::RectangleShape returnBox({ 120,50 });
+    returnBox.setPosition({ 1740,185 });
     returnBox.setFillColor(sf::Color::Red);
 
+    //selection state
+    sf::RectangleShape box1({450,800});
+    box1.setPosition({300,400});
+    box1.setFillColor(sf::Color(12,18,28,210));
+
+    sf::RectangleShape box2({450,800});
+    box2.setPosition({800,400});
+    box2.setFillColor(sf::Color(12,18,28,210));
+
+    sf::RectangleShape box3({450,800});
+    box3.setPosition({1300,400});
+    box3.setFillColor(sf::Color(12,18,28,210));
+
+    //Options
+    // sf::RectangleShape subbox1({420,400});
+    // subbox1.setPosition({310,410});
+    // subbox1.setFillColor(sf::Color(40,37,68));
+
+    sf::Sprite option1(texture);
+    option1.setScale({1.0f,1.0f});
+    option1.setPosition({200,420});
     enum Gamestate
     {
         MENU,
         PLAYING,
+        GAME_OVER,
         SETTINGS
     };
 
     Gamestate currentstate = MENU;
 
     sf::Clock clock;
-    float speed = 400.f;
+    float speed = 300.f;
 
 
     // Bullet resources
@@ -236,13 +284,33 @@ int main()
     std::vector<sf::Sprite> bullets;
     sf::Clock shoot;
 
+    sf::Image enemybullet;
+    enemybullet.resize({ 8, 20 }, sf::Color::Yellow);
+    sf::Texture enemybullettexture;
+    (void)enemybullettexture.loadFromImage(enemybullet);
+    std::vector<sf::Sprite> enemybullets;
+    sf::Clock enemyshoot;
+
+    //highest score
     int highest_score = loadHighest();
 
-    sf::Text high(F,"Highest Score:0",30);
+    sf::Text high(F1, "Highest Score:0", 30);
     high.setFillColor(sf::Color::Magenta);
-    high.setPosition({50.f,260.f});
+    high.setPosition({ 50.f,260.f });
+    high.setStyle(sf::Text::Bold | sf::Text::Italic);
 
-        
+
+    //health part
+    int health = 200;
+
+    sf::Text healthy(F1,"Health : 200 ",30);
+    healthy.setFillColor(sf::Color(255,130,20));
+    healthy.setPosition({50.f,320.f});
+    healthy.setStyle(sf::Text::Bold | sf::Text::Italic);
+
+    float enemy_bullet_speed = 300.f;
+
+
     while (window.isOpen())
     {
         float dt = clock.restart().asSeconds();
@@ -271,7 +339,7 @@ int main()
                         Game.play();
                     }
 
-                    if(Settings.getGlobalBounds().contains(mousePos))
+                    if (Settings.getGlobalBounds().contains(mousePos))
                     {
                         currentstate = Gamestate::SETTINGS;
                         Game.stop();
@@ -284,19 +352,20 @@ int main()
                     }
                 }
 
-                if(currentstate == Gamestate::PLAYING)
+                if (currentstate == Gamestate::PLAYING)
                 {
-                    if(backOption.getGlobalBounds().contains(mousePos))
+                    if (backOption.getGlobalBounds().contains(mousePos))
                     {
                         currentstate = Gamestate::MENU;
                         Menu.play();
                         Game.stop();
+                        enemybullets.clear();
                     }
                 }
 
-                if(currentstate == Gamestate::SETTINGS)
+                if (currentstate == Gamestate::SETTINGS)
                 {
-                    if(backOption.getGlobalBounds().contains(mousePos))
+                    if (backOption.getGlobalBounds().contains(mousePos))
                     {
                         currentstate = Gamestate::MENU;
                         Menu.play();
@@ -351,7 +420,7 @@ int main()
                     bullets.push_back(newBullet);
                     sound.play();
 
-                    
+
                     shoot.restart();
                 }
             }
@@ -367,7 +436,7 @@ int main()
                     totalscore += 20;
                     scoreText.setString("Score: " + std::to_string(totalscore));
 
-                    int highest = UpdatedHighestvalue(totalscore,highest_score);
+                    int highest = UpdatedHighestvalue(totalscore, highest_score);
 
                     high.setString("Highest Score: " + std::to_string(highest));
                     SpawnEnemies(enemy, 2000.0f);
@@ -390,16 +459,61 @@ int main()
             if (enemy.sprite.getPosition().y > 1400.0f)
             {
                 SpawnEnemies(enemy, 2000.0f);
+                enemybullets.clear();
+            }
+            if (enemyshoot.getElapsedTime().asSeconds() > 1.2f)
+            {
+                if (enemy.sprite.getPosition().y > 0.0f)
+                {
+                    sf::Sprite eBullet(enemybullettexture);
+                    float eBulletX = enemy.sprite.getPosition().x + (enemy.sprite.getGlobalBounds().size.x / 2.f) - 4.f;
+                    float eBulletY = enemy.sprite.getPosition().y + enemy.sprite.getGlobalBounds().size.y;
+
+                    eBullet.setPosition({ eBulletX, eBulletY });
+                    enemybullets.push_back(eBullet);
+                }
+                enemyshoot.restart();
+            }
+            for (auto it = enemybullets.begin(); it != enemybullets.end(); )
+            {
+                it->move({ 0.f, enemy_bullet_speed * dt });
+
+                if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
+                {
+                    it = enemybullets.erase(it);
+                    // enemybullets.clear();
+                    // bullets.clear();
+                    // currentstate = Gamestate::MENU;
+                    // Menu.play();
+                    // Game.stop();
+                    // break;
+                    health = health-10;
+                    healthy.setString("Health : " + std::to_string(health));
+                    if(health<=0)
+                    {
+                        currentstate = Gamestate::GAME_OVER;
+                        Game.stop();
+                    }
+                }
+                else if (it->getPosition().y > 1600.f)
+                {
+                    it = enemybullets.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
             }
 
-            if(totalscore%1000==0)
+            if (totalscore % 100 == 0)
             {
-                enemy.speed++;
+                enemy.speed += 0.2;
+                enemy_bullet_speed += 0.2;
             }
 
-            if(totalscore%1500==0)
+            if (totalscore % 200 == 0)
             {
-                speed++;
+                speed += 0.2;
             }
         }
 
@@ -408,7 +522,7 @@ int main()
         if (currentstate == Gamestate::MENU)
         {
             window.draw(backs);
-            window.draw(text);
+            // window.draw(text);
             window.draw(rectangle);
             window.draw(startButton);
             window.draw(rectangle1);
@@ -427,14 +541,28 @@ int main()
             {
                 window.draw(b);
             }
+            for (const auto& eb : enemybullets)
+            {
+                window.draw(eb);
+            }
             window.draw(scoreText);
             window.draw(high);
+            window.draw(healthy);
         }
-        else if(currentstate == Gamestate::SETTINGS)
+        else if (currentstate == Gamestate::SETTINGS)
         {
+            window.draw(Image);
+            window.draw(box1);
+            window.draw(box2);
+            window.draw(box3);
+            window.draw(option1);
             window.draw(returnBox);
             window.draw(backOption);
             window.draw(selectmenu);
+        }
+        else if(currentstate == Gamestate::GAME_OVER)
+        {
+            window.draw(End);
         }
 
         window.display();
