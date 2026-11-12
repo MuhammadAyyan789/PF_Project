@@ -1,7 +1,2 @@
-﻿  battleship.cpp
-  menu.cpp
-  tutorial.cpp
-D:\Projects\battleship\tutorial.cpp(21,22): warning C4834: discarding return value of function with [[nodiscard]] attribute
-D:\Projects\battleship\tutorial.cpp(27,19): warning C4834: discarding return value of function with [[nodiscard]] attribute
-  Generating Code...
-  battleship.vcxproj -> D:\Projects\battleship\x64\Debug\battleship.exe
+﻿  battleshipv2.cpp
+  battleship.vcxproj -> C:\Users\mrosh\Documents\GitHub\PF_Project\x64\Debug\battleship.exe

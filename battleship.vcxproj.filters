@@ -27,6 +27,9 @@
     <ClCompile Include="battleship_menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="battleshipv2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".gitignore" />
