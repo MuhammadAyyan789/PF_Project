@@ -172,7 +172,6 @@ int main()
     if (!backimage.loadFromFile("menu_image.jpg"))
     {
         std::cout << "Failed to load background image 'menu_image.jpg'\n";
-        return -1;
     }
 
     //images of background

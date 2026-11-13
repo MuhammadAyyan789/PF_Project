@@ -13,7 +13,14 @@ struct ENemy
     sf::Sprite sprite;
     float speed = 150.0f; // Pixels per second
 
-    ENemy(const sf::Texture& texture) : sprite(texture) {};
+    sf::Clock shootClock;
+    float shootinterval = 1.5f;
+
+    ENemy(const sf::Texture& texture) : sprite(texture)
+    {
+        sprite.setScale({ 0.35f, 0.35f });
+        shootinterval = 1.0f + static_cast<float>(std::rand() % 15) / 10.0f;
+    };
 };
 
 void SpawnEnemies(ENemy& enemy, float windowWidth)
@@ -29,6 +36,22 @@ void SpawnEnemies(ENemy& enemy, float windowWidth)
     float random = static_cast<float>(std::rand() % static_cast<int>(max));
 
     enemy.sprite.setPosition({ random, -enemyHeight });
+}
+void Spawnnew(std::vector<ENemy>& enemies, const sf::Texture& texture, float windowWidth)
+{
+    ENemy newenemy(texture);
+    sf::FloatRect bounds = newenemy.sprite.getGlobalBounds();
+
+    float enemywidth = bounds.size.x;
+    float enemyheight = bounds.size.y;
+
+    float max = windowWidth - enemywidth;
+    if (max <= 1.0f) max = 1.0f;
+
+    float randomX = static_cast<float>(std::rand() % static_cast<int>(max));
+
+    newenemy.sprite.setPosition({ randomX, -enemyheight - 10.f });
+    enemies.push_back(newenemy);
 }
 
 int loadHighest()
@@ -95,10 +118,13 @@ int main()
     sf::Texture EnemyTexture;
     (void)EnemyTexture.loadFromImage(obstacleImage);
 
-    ENemy enemy(EnemyTexture);
+    /*ENemy enemy(EnemyTexture);
     enemy.sprite.setScale({ 0.35f, 0.35f });
 
-    SpawnEnemies(enemy, 2000.0f);
+    SpawnEnemies(enemy, 2000.0f);*/
+
+    std::vector<ENemy> enemies;
+    sf::Clock enemySpawnClock;
 
     // Background
     sf::Texture back;
@@ -111,6 +137,13 @@ int main()
     sf::Sprite battleship(texture);
     battleship.setPosition({ 900.f, 1200.f });
     battleship.setScale({ 0.4f, 0.4f });
+
+    //Selection menu back image
+    sf::Texture select;
+    select.loadFromFile("selection.jpeg");
+
+    sf::Sprite Image(select);
+    (void)Image.setScale({ 1.5f,1.9f });
 
     // Background Audio
     sf::Music Menu;
@@ -153,10 +186,10 @@ int main()
         std::cout << "Failed to load the text style\n";
     }
 
-    sf::Text text(F, "Welcome to the world of disaster", 70);
-    text.setStyle(sf::Text::Bold | sf::Text::Italic);
-    text.setFillColor(sf::Color::Red);
-    text.setPosition({ 500.f, 200.f });
+    // sf::Text text(F, "Welcome to the world of disaster", 70);
+    // text.setStyle(sf::Text::Bold | sf::Text::Italic);
+    // text.setFillColor(sf::Color::Red);
+    // text.setPosition({ 500.f, 200.f });
 
     sf::Text selectmenu(F, "SELECT YOUR BATTLESHIP", 70);
     selectmenu.setStyle(sf::Text::Bold);
@@ -169,7 +202,7 @@ int main()
     scoreText.setFillColor(sf::Color::Red);
     scoreText.setPosition({ 50.f, 200.f });
     sf::Texture backimage;
-    if (!backimage.loadFromFile("menu_image.jpg"))
+    if (!backimage.loadFromFile("menu2.jpeg"))
     {
         std::cout << "Failed to load background image 'menu_image.jpg'\n";
         return -1;
@@ -177,21 +210,21 @@ int main()
 
     //images of background
     sf::Sprite backs(backimage);
-    backs.setScale({ 1.6f, 1.5f });
+    backs.setScale({ 1.6f, 1.8f });
 
     //Startbutton
     sf::RectangleShape rectangle({ 200,80 });
     rectangle.setPosition({ 870,890 });
-    rectangle.setFillColor(sf::Color::Black);
+    rectangle.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text startButton(F, "PLAY", 50);
-    startButton.setPosition({ 900.f, 900.f });
+    startButton.setPosition({ 910.f, 900.f });
     startButton.setFillColor(sf::Color::Cyan);
 
     //Selection Menu
     sf::RectangleShape rectangle1({ 650,80 });
     rectangle1.setPosition({ 670,990 });
-    rectangle1.setFillColor(sf::Color::Black);
+    rectangle1.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text Settings(F, "BATTLESHIP SELECTION", 50);
     Settings.setPosition({ 700.f,1000.f });
@@ -200,10 +233,10 @@ int main()
     //ExitButton
     sf::RectangleShape rectangle2({ 200,80 });
     rectangle2.setPosition({ 870,1090 });
-    rectangle2.setFillColor(sf::Color::Black);
+    rectangle2.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text exitButton(F, "EXIT", 50);
-    exitButton.setPosition({ 900.f, 1100.f });
+    exitButton.setPosition({ 910.f, 1100.f });
     exitButton.setFillColor(sf::Color::Cyan);
 
     //Return to Main Menu Option
@@ -214,6 +247,25 @@ int main()
     sf::RectangleShape returnBox({ 120,50 });
     returnBox.setPosition({ 1740,185 });
     returnBox.setFillColor(sf::Color::Red);
+
+    //selection state
+    sf::RectangleShape box1({ 450,800 });
+    box1.setPosition({ 300,400 });
+    box1.setFillColor(sf::Color(40, 37, 68));
+
+    sf::RectangleShape box2({ 450,800 });
+    box2.setPosition({ 800,400 });
+    box2.setFillColor(sf::Color(40, 37, 68));
+
+    sf::RectangleShape box3({ 450,800 });
+    box3.setPosition({ 1300,400 });
+    box3.setFillColor(sf::Color(40, 37, 68));
+
+    //Options
+
+    sf::Sprite option1(texture);
+    option1.setScale({ 0.8f,1.0f });
+    option1.setPosition({ 250,420 });
 
     enum Gamestate
     {
@@ -298,6 +350,7 @@ int main()
                         currentstate = Gamestate::MENU;
                         Menu.play();
                         Game.stop();
+                        enemybullets.clear();
                     }
                 }
 
@@ -360,32 +413,81 @@ int main()
 
 
                     shoot.restart();
-
                 }
             }
 
-            // Bullet movement
-            for (auto it = bullets.begin(); it != bullets.end(); )
+
+       //enemy spawn after passage of time
+            if (enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)
             {
-                it->move({ 0.f, -600.f * dt });
-                // it will check if bullet hit enemy 
-                if (it->getGlobalBounds().findIntersection(enemy.sprite.getGlobalBounds()))
+                Spawnnew(enemies, EnemyTexture, 2000.0f);
+                enemySpawnClock.restart();
+            }
+
+           //player and enemy bullet firng
+            for (auto bIt = bullets.begin(); bIt != bullets.end(); )
+            {
+                bIt->move({ 0.f, -600.f * dt });
+                bool bulletRemoved = false;
+
+                for (auto eIt = enemies.begin(); eIt != enemies.end(); )
                 {
-                    // score increment
-                    totalscore += 20;
-                    scoreText.setString("Score: " + std::to_string(totalscore));
+                    if (bIt->getGlobalBounds().findIntersection(eIt->sprite.getGlobalBounds()))
+                    {
+                        totalscore += 20;
+                        scoreText.setString("Score: " + std::to_string(totalscore));
 
-                    int highest = UpdatedHighestvalue(totalscore, highest_score);
+                        int highest = UpdatedHighestvalue(totalscore, highest_score);
+                        high.setString("Highest Score: " + std::to_string(highest));
 
-                    high.setString("Highest Score: " + std::to_string(highest));
-                    SpawnEnemies(enemy, 2000.0f);
-                    enemybullets.clear();
-                    it = bullets.erase(it);
-
+                        eIt = enemies.erase(eIt); // after fire enemy del
+                        bIt = bullets.erase(bIt); 
+                        bulletRemoved = true;
+                        break;
+                    }
+                    else
+                    {
+                        ++eIt;
+                    }
                 }
-                else if (it->getPosition().y < 0.f)
+
+                if (!bulletRemoved)
                 {
-                    it = bullets.erase(it);
+                    if (bIt->getPosition().y < 0.f)
+                    {
+                        bIt = bullets.erase(bIt);
+                    }
+                    else
+                    {
+                        ++bIt;
+                    }
+                }
+            }
+
+            //enemy movement and seperate firing
+            for (auto it = enemies.begin(); it != enemies.end(); )
+            {
+                it->sprite.move({ 0.f, it->speed * dt });
+                //enenmy fire time
+                if (it->shootClock.getElapsedTime().asSeconds() > it->shootinterval)
+                {
+                 // only fire when enemy is on screen
+                    if (it->sprite.getPosition().y > 0.0f && it->sprite.getPosition().y < 1300.f)
+                    {
+                        sf::Sprite eBullet(enemybullettexture);
+                        float eBulletX = it->sprite.getPosition().x + (it->sprite.getGlobalBounds().size.x / 2.f) - 4.f;
+                        float eBulletY = it->sprite.getPosition().y + it->sprite.getGlobalBounds().size.y;
+
+                        eBullet.setPosition({ eBulletX, eBulletY });
+                        enemybullets.push_back(eBullet);
+                    }
+                    it->shootClock.restart();
+                }
+
+             
+                if (it->sprite.getPosition().y > 1500.0f)
+                {
+                    it = enemies.erase(it);
                 }
                 else
                 {
@@ -393,28 +495,7 @@ int main()
                 }
             }
 
-            // Enemy movement using delta time
-            enemy.sprite.move({ 0.f, enemy.speed * dt });
-
-            // Respawn if enemy moves below bottom of the screen
-            if (enemy.sprite.getPosition().y > 1400.0f)
-            {
-                SpawnEnemies(enemy, 2000.0f);
-                enemybullets.clear();
-            }
-            if (enemyshoot.getElapsedTime().asSeconds() > 1.2f)
-            {
-                if (enemy.sprite.getPosition().y > 0.0f)
-                {
-                    sf::Sprite eBullet(enemybullettexture);
-                    float eBulletX = enemy.sprite.getPosition().x + (enemy.sprite.getGlobalBounds().size.x / 2.f) - 4.f;
-                    float eBulletY = enemy.sprite.getPosition().y + enemy.sprite.getGlobalBounds().size.y;
-
-                    eBullet.setPosition({ eBulletX, eBulletY });
-                    enemybullets.push_back(eBullet);
-                }
-                enemyshoot.restart();
-            }
+             //enemy bulet movement and player intersection
             for (auto it = enemybullets.begin(); it != enemybullets.end(); )
             {
                 it->move({ 0.f, 400.f * dt });
@@ -424,6 +505,7 @@ int main()
                     it = enemybullets.erase(it);
                     enemybullets.clear();
                     bullets.clear();
+                    enemies.clear(); 
                     currentstate = Gamestate::MENU;
                     Menu.play();
                     Game.stop();
@@ -439,14 +521,63 @@ int main()
                 }
             }
 
-            if (totalscore % 1000 == 0)
+            //// Enemy movement using delta time
+            //enemy.sprite.move({ 0.f, enemy.speed * dt });
+
+            //// Respawn if enemy moves below bottom of the screen
+            //if (enemy.sprite.getPosition().y > 1400.0f)
+            //{
+            //    SpawnEnemies(enemy, 2000.0f);
+            //    enemybullets.clear();
+            //}
+            //if (enemyshoot.getElapsedTime().asSeconds() > 1.2f)
+            //{
+            //    if (enemy.sprite.getPosition().y > 0.0f)
+            //    {
+            //        sf::Sprite eBullet(enemybullettexture);
+            //        float eBulletX = enemy.sprite.getPosition().x + (enemy.sprite.getGlobalBounds().size.x / 2.f) - 4.f;
+            //        float eBulletY = enemy.sprite.getPosition().y + enemy.sprite.getGlobalBounds().size.y;
+
+            //        eBullet.setPosition({ eBulletX, eBulletY });
+            //        enemybullets.push_back(eBullet);
+            //    }
+            //    enemyshoot.restart();
+            //}
+            //for (auto it = enemybullets.begin(); it != enemybullets.end(); )
+            //{
+            //    it->move({ 0.f, 400.f * dt });
+
+            //    if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
+            //    {
+            //        it = enemybullets.erase(it);
+            //        enemybullets.clear();
+            //        bullets.clear();
+            //        currentstate = Gamestate::MENU;
+            //        Menu.play();
+            //        Game.stop();
+            //        break;
+            //    }
+            //    else if (it->getPosition().y > 1600.f)
+            //    {
+            //        it = enemybullets.erase(it);
+            //    }
+            //    else
+            //    {
+            //        ++it;
+            //    }
+            //}
+
+            if (totalscore % 200 == 0)
             {
-                enemy.speed++;
+                for (auto& en : enemies)
+                {
+                    en.speed += 0.1f;
+                }
             }
 
-            if (totalscore % 1500 == 0)
+            if (totalscore % 300 == 0)
             {
-                speed++;
+                speed += 0.1;
             }
         }
 
@@ -455,7 +586,7 @@ int main()
         if (currentstate == Gamestate::MENU)
         {
             window.draw(backs);
-            window.draw(text);
+            // window.draw(text);
             window.draw(rectangle);
             window.draw(startButton);
             window.draw(rectangle1);
@@ -469,23 +600,28 @@ int main()
             window.draw(returnBox);
             window.draw(backOption);
             window.draw(battleship);
-            window.draw(enemy.sprite);
-
+            for (const auto& en : enemies)
+            {
+                window.draw(en.sprite);
+            }
             for (const auto& b : bullets)
             {
                 window.draw(b);
             }
-
             for (const auto& eb : enemybullets)
             {
                 window.draw(eb);
             }
-
             window.draw(scoreText);
             window.draw(high);
         }
         else if (currentstate == Gamestate::SETTINGS)
         {
+            window.draw(Image);
+            window.draw(box1);
+            window.draw(box2);
+            window.draw(box3);
+            window.draw(option1);
             window.draw(returnBox);
             window.draw(backOption);
             window.draw(selectmenu);
