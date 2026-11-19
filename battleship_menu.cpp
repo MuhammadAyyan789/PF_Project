@@ -101,7 +101,7 @@ int main()
 
     // Player ship
     sf::Image battleshipImage;
-    if (battleshipImage.loadFromFile("enemybattleship.png"))
+    if (battleshipImage.loadFromFile("enemybattleship (1).png"))
     {
         battleshipImage.createMaskFromColor(sf::Color::White, 0);
     }
@@ -114,6 +114,13 @@ int main()
     if (obstacleImage.loadFromFile("Enemy_battleship.png"))
     {
         obstacleImage.createMaskFromColor(sf::Color::White, 0);
+    }
+
+    //bullet image
+    sf::Texture bul;
+    if(!bul.loadFromFile("bullet_image (1).png"))
+    {
+        std::cout<<"Unable to load image";
     }
 
     sf::Texture EnemyTexture;
@@ -131,8 +138,8 @@ int main()
 
     // Player Sprite setup (placed inside visible screen)
     sf::Sprite battleship(texture);
-    battleship.setScale({0.4,0.4});
-    battleship.setPosition({ 900.f, 1200.f });
+    battleship.setScale({0.4f,0.4f});
+    battleship.setPosition({ 800.f, 1200.f });
 
     //Selection menu back image
     sf::Texture select;
@@ -141,16 +148,16 @@ int main()
         std::cout<<"Unable to load image";
     }
     sf::Sprite Image(select);
-    (void)Image.setScale({ 1.0f,1.0f });
+    Image.setScale({ 1.6f,2.2f });
 
         //GameOver
     sf::Texture over;
-    if(!over.loadFromFile("GameOver1.jpg"))
+    if(!over.loadFromFile("GameOver.jpeg"))
     {
         std::cout<<"Unable to load image";
     }
     sf::Sprite End(over);
-    End.setScale({1.9f,1.7f});
+    End.setScale({1.3f,1.6f});
 
     // Background Audio
     sf::Music Menu;
@@ -161,7 +168,7 @@ int main()
     else
     {
         Menu.setLooping(true);
-        Menu.setVolume(100.f);
+        Menu.setVolume(200.f);
         Menu.play();
     }
 
@@ -173,7 +180,19 @@ int main()
     else
     {
         Game.setLooping(true);
-        Game.setVolume(50.f);
+        Game.setVolume(100.f);
+    }
+
+    //GameOver voice
+    sf::Music voice;
+    if(!voice.openFromFile("GameEnding.mp3"))
+    {
+        std::cout<<"Unable to load the game music";
+    }
+    else
+    {
+        voice.setLooping(false);
+        voice.setVolume(150.f);
     }
 
     //bullets buffer voice
@@ -183,8 +202,25 @@ int main()
         std::cout << "Unable to load buffer ";
     }
     sf::Sound sound(bulletsound);
-    sound.setVolume(100);
+    sound.setVolume(150);
 
+    //crashing buffer sound of spaceships 
+    sf::SoundBuffer Crashing;
+    if(!Crashing.loadFromFile("Crash.mp3"))
+    {
+        std::cout<<"Unable to load buffer ";
+    }
+    sf::Sound crash(Crashing);
+    crash.setVolume(150);
+
+    //hitting bullets buffer sound
+    sf::SoundBuffer hit;
+    if(!hit.loadFromFile("hitting_effect.wav"))
+    {
+        std::cout<<"Unable to load buffer ";
+    }
+    sf::Sound hitting(hit);
+    hitting.setVolume(150);
 
     // Font & Text
     sf::Font F;
@@ -203,7 +239,7 @@ int main()
     // text.setFillColor(sf::Color::Red);
     // text.setPosition({ 500.f, 200.f });
 
-    sf::Text selectmenu(F, "SELECT YOUR BATTLESHIP", 70);
+    sf::Text selectmenu(F, "SELECT YOUR FAVOURITE BATTLESHIP", 70);
     selectmenu.setStyle(sf::Text::Bold);
     selectmenu.setFillColor(sf::Color::White);
     selectmenu.setPosition({ 550.f,250 });
@@ -256,10 +292,10 @@ int main()
     //Return to Main Menu Option
     sf::Text backOption(F, "Return", 30);
     backOption.setFillColor(sf::Color::Black);
-    backOption.setPosition({ 1750,200 });
+    backOption.setPosition({ 1810,40 });
 
     sf::RectangleShape returnBox({ 120,50 });
-    returnBox.setPosition({ 1740,185 });
+    returnBox.setPosition({ 1800,30 });
     returnBox.setFillColor(sf::Color::Red);
 
     //selection state
@@ -332,7 +368,7 @@ int main()
 
     //  other 2 battleship textures
     sf::Image shipImg2;
-    if (!shipImg2.loadFromFile("battleship2.png"))
+    if (!shipImg2.loadFromFile("battleship2 (1).png"))
     {
         std::cout<<"Unable to load image";
     }
@@ -340,7 +376,7 @@ int main()
     (void)shipTex2.loadFromImage(shipImg2);
 
     sf::Image shipImg3;
-    if (!shipImg3.loadFromFile("battleship3.png"))
+    if (!shipImg3.loadFromFile("battleship3 (1).png"))
     {
         std::cout<<"Unable to load image";
     }
@@ -362,8 +398,8 @@ int main()
     biomeBox.setPosition({ 765.f, 1090.f });
     biomeBox.setFillColor(sf::Color(40, 37, 68));
 
-    sf::Text biomeButton(F, "CHOOSE BIOME", 50);
-    biomeButton.setPosition({ 790.f, 1100.f });
+    sf::Text biomeButton(F, "MAP SELECTION", 50);
+    biomeButton.setPosition({ 805.f, 1100.f });
     biomeButton.setFillColor(sf::Color::Cyan);
 
     // how to play button
@@ -372,7 +408,7 @@ int main()
     howToPlayBox.setFillColor(sf::Color(40, 37, 68));
 
     sf::Text howToPlayButton(F, "HOW TO PLAY", 50);
-    howToPlayButton.setPosition({ 810.f, 1200.f });
+    howToPlayButton.setPosition({ 830.f, 1200.f });
     howToPlayButton.setFillColor(sf::Color::Cyan);
 
     // exit button to the last
@@ -392,87 +428,87 @@ int main()
 
     // battleship selection cards 
     sf::RectangleShape shipCard1({ 420.f, 480.f });
-    shipCard1.setPosition({ 250.f, 450.f });
-    shipCard1.setFillColor(sf::Color(30, 30, 30));
+    shipCard1.setPosition({ 250.f, 650.f });
+    shipCard1.setFillColor(sf::Color(0, 0, 0, 210));
     shipCard1.setOutlineThickness(6.f);
 
     sf::RectangleShape shipCard2({ 420.f, 480.f });
-    shipCard2.setPosition({ 790.f, 450.f });
-    shipCard2.setFillColor(sf::Color(30, 30, 30));
+    shipCard2.setPosition({ 790.f, 650.f });
+    shipCard2.setFillColor(sf::Color(0, 0, 0, 210));
     shipCard2.setOutlineThickness(6.f);
 
     sf::RectangleShape shipCard3({ 420.f, 480.f });
-    shipCard3.setPosition({ 1330.f, 450.f });
-    shipCard3.setFillColor(sf::Color(30, 30, 30));
+    shipCard3.setPosition({ 1330.f, 650.f });
+    shipCard3.setFillColor(sf::Color(0, 0, 0, 210));
     shipCard3.setOutlineThickness(6.f);
 
     sf::Sprite shipPreview1(texture);
-    shipPreview1.setScale({ 500.f / texture.getSize().x, 300.f / texture.getSize().y });
-    shipPreview1.setPosition({ 250.f, 480.f });
+    shipPreview1.setScale({ 300.f / texture.getSize().x, 300.f / texture.getSize().y });
+    shipPreview1.setPosition({ 300.f, 680.f });
 
     sf::Sprite shipPreview2(shipTex2);
     shipPreview2.setScale({ 300.f / shipTex2.getSize().x, 300.f / shipTex2.getSize().y });
-    shipPreview2.setPosition({ 850.f, 480.f });
+    shipPreview2.setPosition({ 850.f, 680.f });
 
     sf::Sprite shipPreview3(shipTex3);
     shipPreview3.setScale({ 300.f / shipTex3.getSize().x, 300.f / shipTex3.getSize().y });
-    shipPreview3.setPosition({ 1390.f, 480.f });
+    shipPreview3.setPosition({ 1390.f, 680.f });
 
     sf::Text shipLabel1(F, "BATTLESHIP 1\nRapture", 35);
-    shipLabel1.setPosition({ 335.f, 840.f });
+    shipLabel1.setPosition({ 335.f, 1040.f });
     shipLabel1.setFillColor(sf::Color::White);
 
     sf::Text shipLabel2(F, "BATTLESHIP 2\nMoon", 35);
-    shipLabel2.setPosition({ 875.f, 840.f });
+    shipLabel2.setPosition({ 875.f, 1040.f });
     shipLabel2.setFillColor(sf::Color::White);
 
     sf::Text shipLabel3(F, "BATTLESHIP 3\nZeta", 35);
-    shipLabel3.setPosition({ 1415.f, 840.f });
+    shipLabel3.setPosition({ 1415.f, 1040.f });
     shipLabel3.setFillColor(sf::Color::White);
 
     // biome selection cards
-    sf::Text biomeTitle(F, "SELECT YOUR BIOME", 70);
+    sf::Text biomeTitle(F, "SELECT YOUR BACKGROUND MAP", 70);
     biomeTitle.setStyle(sf::Text::Bold);
-    biomeTitle.setFillColor(sf::Color::Cyan);
-    biomeTitle.setPosition({ 620.f, 250.f });
+    biomeTitle.setFillColor(sf::Color::White);
+    biomeTitle.setPosition({ 630.f, 250.f });
 
     sf::RectangleShape biomeCard1({ 460.f, 420.f });
-    biomeCard1.setPosition({ 200.f, 450.f });
-    biomeCard1.setFillColor(sf::Color::Black);
+    biomeCard1.setPosition({ 200.f, 650.f });
+    biomeCard1.setFillColor(sf::Color(0, 0, 0, 210));
     biomeCard1.setOutlineThickness(6.f);
 
     sf::RectangleShape biomeCard2({ 460.f, 420.f });
-    biomeCard2.setPosition({ 770.f, 450.f });
-    biomeCard2.setFillColor(sf::Color::Black);
+    biomeCard2.setPosition({ 770.f, 650.f });
+    biomeCard2.setFillColor(sf::Color(0, 0, 0, 210));
     biomeCard2.setOutlineThickness(6.f);
 
     sf::RectangleShape biomeCard3({ 460.f, 420.f });
-    biomeCard3.setPosition({ 1340.f, 450.f });
-    biomeCard3.setFillColor(sf::Color::Black);
+    biomeCard3.setPosition({ 1340.f, 650.f });
+    biomeCard3.setFillColor(sf::Color(0, 0, 0, 210));
     biomeCard3.setOutlineThickness(6.f);
 
     sf::Sprite biomePreview1(back);
     biomePreview1.setScale({ 420.f / back.getSize().x, 280.f / back.getSize().y });
-    biomePreview1.setPosition({ 220.f, 470.f });
+    biomePreview1.setPosition({ 220.f, 670.f });
 
     sf::Sprite biomePreview2(biomeTex2);
     biomePreview2.setScale({ 420.f / biomeTex2.getSize().x, 280.f / biomeTex2.getSize().y });
-    biomePreview2.setPosition({ 790.f, 470.f });
+    biomePreview2.setPosition({ 790.f, 670.f });
 
     sf::Sprite biomePreview3(biomeTex3);
     biomePreview3.setScale({ 420.f / biomeTex3.getSize().x, 280.f / biomeTex3.getSize().y });
-    biomePreview3.setPosition({ 1360.f, 470.f });
+    biomePreview3.setPosition({ 1360.f, 670.f });
 
     sf::Text biomeLabel1(F, "BIOME 1\n (MOON)", 32);
-    biomeLabel1.setPosition({ 295.f, 790.f });
+    biomeLabel1.setPosition({ 295.f, 990.f });
     biomeLabel1.setFillColor(sf::Color::White);
 
     sf::Text biomeLabel2(F, "BIOME 2\n(MOTHERSHIP ZETA)", 32);
-    biomeLabel2.setPosition({ 850.f, 790.f });
+    biomeLabel2.setPosition({ 850.f, 990.f });
     biomeLabel2.setFillColor(sf::Color::White);
 
     sf::Text biomeLabel3(F, "BIOME 3\n(RAPTURE)", 32);
-    biomeLabel3.setPosition({ 1500.f, 790.f });
+    biomeLabel3.setPosition({ 1500.f, 990.f });
     biomeLabel3.setFillColor(sf::Color::White);
 
     // tutorial ui panel
@@ -484,7 +520,7 @@ int main()
 
     sf::Text howToTitle(F, "HOW TO PLAY", 70);
     howToTitle.setStyle(sf::Text::Bold);
-    howToTitle.setFillColor(sf::Color::Cyan);
+    howToTitle.setFillColor(sf::Color::White);
     howToTitle.setPosition({ 750.f, 230.f });
 
     sf::Text howToBody(
@@ -503,9 +539,12 @@ int main()
     float speed = 400.f;
 
 
-    // Bullet resources
+    //Reverse Bullet resources
     sf::Image bullet;
-    bullet.resize({ 8, 20 }, sf::Color::Yellow);
+    if(!bullet.loadFromFile("reverse_bullet_image (1).png"))
+    {
+        std::cout<<"Unable to load image";
+    }
     sf::Texture bullettexture;
     (void)bullettexture.loadFromImage(bullet);
     std::vector<sf::Sprite> bullets;
@@ -521,7 +560,7 @@ int main()
     //highest score
     int highest_score = loadHighest();
 
-    sf::Text high(F1, "Highest Score:0", 30);
+    sf::Text high(F1, "Highest Score:"+ std::to_string(highest_score), 30);
     high.setFillColor(sf::Color::Magenta);
     high.setPosition({ 50.f,260.f });
     high.setStyle(sf::Text::Bold | sf::Text::Italic);
@@ -597,6 +636,7 @@ int main()
                         Menu.play();
                         Game.stop();
                         enemybullets.clear();
+                        
                     }
                 }
 
@@ -659,6 +699,44 @@ int main()
                         gameMusicActive = false;
                     }
                 }
+
+                //Game Over state
+                if(currentstate == Gamestate::GAME_OVER)
+                {
+                    voice.play();
+                    if (backOption.getGlobalBounds().contains(clickPos))
+                    {
+                        voice.stop();
+                        currentstate = Gamestate::MENU;
+                        Menu.play();
+                    }
+                    if (muteBox.getGlobalBounds().contains(clickPos))
+                    {
+                        voice.stop();   
+                         isMuted = !isMuted;
+                        if (isMuted)
+                       {
+                        Menu.setVolume(0.f);
+                        Game.setVolume(0.f);
+                        sound.setVolume(0.f);
+                        voice.setVolume(0.f);
+                        muteButton.setString("SOUND: OFF");
+                        muteButton.setFillColor(sf::Color::Red);
+                        muteBox.setOutlineColor(sf::Color::Red);
+                       }
+                       else
+                       {
+                        Menu.setVolume(200.f);
+                        Game.setVolume(100.f);
+                        sound.setVolume(150.f);
+                        voice.setVolume(150.f);
+                        muteButton.setString("SOUND: ON");
+                        muteButton.setFillColor(sf::Color::Cyan);
+                        muteBox.setOutlineColor(sf::Color::Cyan);
+                       }
+                    }
+                }
+
                 // else if (prevState == Gamestate::SETTINGS && currentstate == Gamestate::SETTINGS)
                 else if(currentstate == Gamestate::SETTINGS)
                 {
@@ -669,7 +747,7 @@ int main()
                         {
                             selectedShip = 1;
                             battleship.setTexture(texture, true);
-                            battleship.setScale({0.4,0.4});
+                            battleship.setScale({0.5,0.5});
                         }
                         else if (shipCard2.getGlobalBounds().contains(clickPos))
                         {
@@ -708,6 +786,8 @@ int main()
             }
         }
 
+
+
         if (currentstate == Gamestate::PLAYING)
         {
             // Player movement
@@ -727,14 +807,14 @@ int main()
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
             {
-                if (battleship.getPosition().y > 200.f)
+                if (battleship.getPosition().y > 0.f)
                 {
                     battleship.move({ 0.f, -speed * dt });
                 }
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down))
             {
-                if (battleship.getPosition().y < 1400.f - battleship.getGlobalBounds().size.y)
+                if (battleship.getPosition().y < 1600.f - battleship.getGlobalBounds().size.y)
                 {
                     battleship.move({ 0.f, speed * dt });
                 }
@@ -745,11 +825,12 @@ int main()
             {
                 if (shoot.getElapsedTime().asSeconds() > 0.15f)
                 {
-                    sf::Sprite newBullet(bullettexture);
+                    sf::Sprite newBullet(bul);
+                    newBullet.setScale({0.2,0.3});
                     float bulletx = battleship.getPosition().x + (battleship.getGlobalBounds().size.x / 2.f) - 4.f;
                     float bullety = battleship.getPosition().y;
 
-                    newBullet.setPosition({ bulletx, bullety });
+                    newBullet.setPosition({ bulletx, bullety});
                     bullets.push_back(newBullet);
                     sound.play();
 
@@ -784,6 +865,7 @@ int main()
                         eIt = enemies.erase(eIt); // after fire enemy del
                         bIt = bullets.erase(bIt); 
                         bulletRemoved = true;
+                        hitting.play();
                         break;
                     }
                     else
@@ -815,20 +897,30 @@ int main()
                  // only fire when enemy is on screen
                     if (it->sprite.getPosition().y > 0.0f && it->sprite.getPosition().y < 1300.f)
                     {
-                        sf::Sprite eBullet(enemybullettexture);
+                        sf::Sprite eBullet(bullettexture);
+                        eBullet.setScale({0.2,0.3});
                         float eBulletX = it->sprite.getPosition().x + (it->sprite.getGlobalBounds().size.x / 2.f) - 4.f;
                         float eBulletY = it->sprite.getPosition().y + it->sprite.getGlobalBounds().size.y;
 
-                        eBullet.setPosition({ eBulletX, eBulletY });
+                        eBullet.setPosition({ eBulletX, eBulletY});
                         enemybullets.push_back(eBullet);
                     }
                     it->shootClock.restart();
                 }
 
+                if (it->sprite.getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
+                {
+                    health = health-10;
+                    it = enemies.erase(it);
+                    crash.play();
+                }
              
-                if (it->sprite.getPosition().y > 1500.0f)
+                else if (it->sprite.getPosition().y > 1500.0f)
                 {
                     it = enemies.erase(it);
+                    health = health - 10;
+                    healthy.setString("Health : " + std::to_string(health));
+                    crash.play();
                 }
                 else
                 {
@@ -840,6 +932,18 @@ int main()
             for (auto it = enemybullets.begin(); it != enemybullets.end(); )
             {
                 it->move({ 0.f, enemy_bullet_speed* dt });
+                if(health<=0)
+                {
+                    currentstate = Gamestate::GAME_OVER;
+                    Game.stop();
+                    voice.play();
+                    current_score=totalscore;
+                    totalscore=0;
+                    health=200;
+                    enemy_bullet_speed=500.f;
+                    enemy_speed = 300.f;
+                    speed = 400.f;
+                }
 
                 if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
                 {
@@ -849,17 +953,7 @@ int main()
                     // enemies.clear();
                     health = health-10;
                     healthy.setString("Health : " + std::to_string(health));
-                    if(health<=0)
-                    {
-                        currentstate = Gamestate::GAME_OVER;
-                        Game.stop();
-                        current_score=totalscore;
-                        totalscore=0;
-                        health=200;
-                        enemy_bullet_speed=500.f;
-                        enemy_speed = 300.f;
-                        speed = 400.f;
-                    }
+                    hitting.play();
                 }
                 else if (it->getPosition().y > 1600.f)
                 {
@@ -870,58 +964,6 @@ int main()
                     ++it;
                 }
             }
-            // // Enemy movement using delta time
-            // enemy.sprite.move({ 0.f, enemy.speed * dt });
-
-            // // Respawn if enemy moves below bottom of the screen
-            // if (enemy.sprite.getPosition().y > 1400.0f)
-            // {
-            //     SpawnEnemies(enemy, 2000.0f);
-            //     enemybullets.clear();
-            // }
-            // if (enemyshoot.getElapsedTime().asSeconds() > 1.2f)
-            // {
-            //     if (enemy.sprite.getPosition().y > 0.0f)
-            //     {
-            //         sf::Sprite eBullet(enemybullettexture);
-            //         float eBulletX = enemy.sprite.getPosition().x + (enemy.sprite.getGlobalBounds().size.x / 2.f) - 4.f;
-            //         float eBulletY = enemy.sprite.getPosition().y + enemy.sprite.getGlobalBounds().size.y;
-
-            //         eBullet.setPosition({ eBulletX, eBulletY });
-            //         enemybullets.push_back(eBullet);
-            //     }
-            //     enemyshoot.restart();
-            // }
-            // for (auto it = enemybullets.begin(); it != enemybullets.end(); )
-            // {
-            //     it->move({ 0.f, enemy_bullet_speed * dt });
-
-            //     if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
-            //     {
-            //         it = enemybullets.erase(it);
-            //         // enemybullets.clear();
-            //         // bullets.clear();
-            //         // currentstate = Gamestate::MENU;
-            //         // Menu.play();
-            //         // Game.stop();
-            //         // break;
-                    // health = health-10;
-                    // healthy.setString("Health : " + std::to_string(health));
-                    // if(health<=0)
-                    // {
-                    //     currentstate = Gamestate::GAME_OVER;
-                    //     Game.stop();
-                    // }
-            //     }
-            //     else if (it->getPosition().y > 1600.f)
-            //     {
-            //         it = enemybullets.erase(it);
-            //     }
-            //     else
-            //     {
-            //         ++it;
-            //     }
-            // }
 
             if (totalscore % 100 == 0)
             {
@@ -983,22 +1025,14 @@ int main()
         else if (currentstate == Gamestate::SETTINGS)
         {
             window.draw(Image);
-            // window.draw(box1);
-            // window.draw(box2);
-            // window.draw(box3);
-            // window.draw(option1);
-            // window.draw(returnBox);
-            // window.draw(backOption);
-            // window.draw(selectmenu);
-             window.draw(returnBox);
+            window.draw(returnBox);
             window.draw(backOption);
-            window.draw(selectmenu);
 
 
             if (customScreen == 0)
             {
                 //draw battleship selection screen
-                window.draw(backs);
+                // window.draw(backs);
                 window.draw(returnBox);
                 window.draw(backOption);
                 window.draw(selectmenu);
@@ -1030,8 +1064,8 @@ int main()
             }
             else if (customScreen == 1)
             {
-                // draw buome selection screen
-                window.draw(backs);
+                // draw biome selection screen
+                // window.draw(backs);
                 window.draw(returnBox);
                 window.draw(backOption);
                 window.draw(biomeTitle);
@@ -1064,7 +1098,7 @@ int main()
             else if (customScreen == 2)
             {
 
-                window.draw(backs);
+                // window.draw(backs);
                 window.draw(returnBox);
                 window.draw(backOption);
                 window.draw(howToTitle);
@@ -1079,6 +1113,10 @@ int main()
         else if(currentstate == Gamestate::GAME_OVER)
         {
             window.draw(End);
+            window.draw(returnBox);
+            window.draw(backOption);
+            window.draw(muteBox);
+            window.draw(muteButton);
         }
 
         window.display();

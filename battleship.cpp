@@ -870,58 +870,6 @@ int main()
                     ++it;
                 }
             }
-            // // Enemy movement using delta time
-            // enemy.sprite.move({ 0.f, enemy.speed * dt });
-
-            // // Respawn if enemy moves below bottom of the screen
-            // if (enemy.sprite.getPosition().y > 1400.0f)
-            // {
-            //     SpawnEnemies(enemy, 2000.0f);
-            //     enemybullets.clear();
-            // }
-            // if (enemyshoot.getElapsedTime().asSeconds() > 1.2f)
-            // {
-            //     if (enemy.sprite.getPosition().y > 0.0f)
-            //     {
-            //         sf::Sprite eBullet(enemybullettexture);
-            //         float eBulletX = enemy.sprite.getPosition().x + (enemy.sprite.getGlobalBounds().size.x / 2.f) - 4.f;
-            //         float eBulletY = enemy.sprite.getPosition().y + enemy.sprite.getGlobalBounds().size.y;
-
-            //         eBullet.setPosition({ eBulletX, eBulletY });
-            //         enemybullets.push_back(eBullet);
-            //     }
-            //     enemyshoot.restart();
-            // }
-            // for (auto it = enemybullets.begin(); it != enemybullets.end(); )
-            // {
-            //     it->move({ 0.f, enemy_bullet_speed * dt });
-
-            //     if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
-            //     {
-            //         it = enemybullets.erase(it);
-            //         // enemybullets.clear();
-            //         // bullets.clear();
-            //         // currentstate = Gamestate::MENU;
-            //         // Menu.play();
-            //         // Game.stop();
-            //         // break;
-                    // health = health-10;
-                    // healthy.setString("Health : " + std::to_string(health));
-                    // if(health<=0)
-                    // {
-                    //     currentstate = Gamestate::GAME_OVER;
-                    //     Game.stop();
-                    // }
-            //     }
-            //     else if (it->getPosition().y > 1600.f)
-            //     {
-            //         it = enemybullets.erase(it);
-            //     }
-            //     else
-            //     {
-            //         ++it;
-            //     }
-            // }
 
             if (totalscore % 100 == 0)
             {
