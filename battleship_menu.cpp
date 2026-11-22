@@ -18,7 +18,7 @@ struct ENemy
 
     ENemy(const sf::Texture& texture) : sprite(texture)
     {
-        sprite.setScale({ 0.35f, 0.35f });
+        sprite.setScale({ 0.35f, 0.45f });
         shootinterval = 1.0f + static_cast<float>(std::rand() % 15) / 10.0f;
     };
 };
@@ -26,17 +26,35 @@ struct ENemy
 void SpawnEnemies(ENemy& enemy, float windowWidth)
 {
     sf::FloatRect bounds = enemy.sprite.getGlobalBounds();
-
-    float enemyWidth = bounds.size.x;
-    float enemyHeight = bounds.size.y;
-
-    float max = windowWidth - enemyWidth;
-    if (max <= 1.0f) max = 1.0f;
-
-    float random = static_cast<float>(std::rand() % static_cast<int>(max));
-
-    enemy.sprite.setPosition({ random, -enemyHeight });
+    // float enemyWidth = bounds.size.x;
+    // float enemyHeight = bounds.size.y;
+    // float max = windowWidth - enemyWidth;
+    // if (max <= 1.0f) max = 1.0f;
+    // float random = static_cast<float>(std::rand() % static_cast<int>(max));
+    float position[10][2]={{30.f,0},{230.f,0},{430.f,0},{630.f,0},{830,0},{1030,0},{1230,0},{1430,0},{1700,0},{1930,0}};
+    int random = std::rand() % 10;
+    enemy.sprite.setPosition({position[random][0], 0.f});
 }
+
+void HealthPoint(sf::Sprite &point, float windowWidth, float windowHeight)
+{
+   sf::FloatRect bound = point.getGlobalBounds();
+   float max_width = windowWidth - 200- bound.size.x;
+   float max_height = windowHeight -300-bound.size.y;
+   float random = std::rand()%((int)max_width);
+   float random1 = std::rand()%((int)max_height);
+   if(random1<200)
+   {
+    random1 = random1 + 120;
+   }
+   if(random<200)
+   {
+    random = random + 120;
+   }
+   point.setScale({0.3,0.3});
+   point.setPosition({random,random1});
+}
+
 void Spawnnew(std::vector<ENemy>& enemies, const sf::Texture& texture, float windowWidth)
 {
     ENemy newenemy(texture);
@@ -49,7 +67,6 @@ void Spawnnew(std::vector<ENemy>& enemies, const sf::Texture& texture, float win
     if (max <= 1.0f) max = 1.0f;
 
     float randomX = static_cast<float>(std::rand() % static_cast<int>(max));
-
     newenemy.sprite.setPosition({ randomX, -enemyheight - 10.f });
     enemies.push_back(newenemy);
 }
@@ -109,7 +126,7 @@ int main()
     sf::Texture texture;
     (void)texture.loadFromImage(battleshipImage);
 
-    // Enemy ship
+    // Enemy ship (default loading)
     sf::Image obstacleImage;
     if (obstacleImage.loadFromFile("Enemy_battleship.png"))
     {
@@ -131,10 +148,10 @@ int main()
     
     // Background
     sf::Texture back;
-    (void)back.loadFromFile("spaceback2.png");
+    (void)back.loadFromFile("Back (2).jpeg");
 
     sf::Sprite background(back);
-    background.setScale({ 1.0f, 1.5f });
+    background.setScale({ 1.4f, 1.3f });
 
     // Player Sprite setup (placed inside visible screen)
     sf::Sprite battleship(texture);
@@ -143,21 +160,21 @@ int main()
 
     //Selection menu back image
     sf::Texture select;
-    if(!select.loadFromFile("selection.jpeg"))
+    if(!select.loadFromFile("Select (1).jpeg"))
     {
         std::cout<<"Unable to load image";
     }
     sf::Sprite Image(select);
-    Image.setScale({ 1.6f,2.2f });
+    Image.setScale({ 1.3f,1.8f });
 
-        //GameOver
+    //GameOver
     sf::Texture over;
     if(!over.loadFromFile("GameOver.jpeg"))
     {
         std::cout<<"Unable to load image";
     }
     sf::Sprite End(over);
-    End.setScale({1.3f,1.6f});
+    End.setScale({1.3f,1.3f});
 
     // Background Audio
     sf::Music Menu;
@@ -182,6 +199,27 @@ int main()
         Game.setLooping(true);
         Game.setVolume(100.f);
     }
+
+    //Heart Beat Effect
+    sf::Music Heart;
+    if(!Heart.openFromFile("Heart_effect.mp3"))
+    {
+        std::cout<<"Unable to load the heart_beat effect";
+    }
+    else
+    {
+        Heart.setLooping(true);
+        Heart.setVolume(400.f);
+    }
+
+    //Life gaining buffer sound
+    sf::SoundBuffer Life;
+    if(!Life.loadFromFile("life_voice.mp3"))
+    {
+        std::cout<<"Unable to load life voice";
+    }
+    sf::Sound life_voice(Life);
+    life_voice.setVolume(400);
 
     //GameOver voice
     sf::Music voice;
@@ -234,10 +272,6 @@ int main()
     {
         std::cout<<"Failes to load the text style\n";
     }
-    // sf::Text text(F, "Welcome to the world of disaster", 70);
-    // text.setStyle(sf::Text::Bold | sf::Text::Italic);
-    // text.setFillColor(sf::Color::Red);
-    // text.setPosition({ 500.f, 200.f });
 
     sf::Text selectmenu(F, "SELECT YOUR FAVOURITE BATTLESHIP", 70);
     selectmenu.setStyle(sf::Text::Bold);
@@ -246,48 +280,68 @@ int main()
 
     //score
     int totalscore = 0;
-    sf::Text scoreText(F1, "Score: 0", 30);
+    sf::Text score(F,"Score",25);
+    score.setPosition({50.f,140.f});
+    score.setFillColor(sf::Color::White);
+    sf::Text scoreText(F1, "0", 50);
     scoreText.setFillColor(sf::Color::Red);
-    scoreText.setPosition({ 50.f, 200.f });
+    scoreText.setPosition({ 50.f, 170.f });
     scoreText.setStyle(sf::Text::Bold | sf::Text::Italic);
+
+    //Level Box
+    sf::RectangleShape levelbox({200,100});
+    levelbox.setPosition({940,0});
+    levelbox.setFillColor(sf::Color::Transparent);
+    levelbox.setOutlineThickness({5});
+    levelbox.setOutlineColor(sf::Color::Cyan);
+
+    sf::Text lvl(F,"Level One \nGet ready",30);
+    lvl.setPosition({980,10});
+    lvl.setFillColor(sf::Color::White);
 
 
     sf::Texture backimage;
-    if (!backimage.loadFromFile("menu2.jpeg"))
+    if (!backimage.loadFromFile("Menu_back.jpeg"))
     {
         std::cout << "Failed to load background image 'menu_image.jpg'\n";
     }
 
     //images of background
     sf::Sprite backs(backimage);
-    backs.setScale({ 1.6f, 2.2f });
+    backs.setScale({ 1.3f, 1.8f });
 
     //Startbutton
     sf::RectangleShape rectangle({ 200,80 });
     rectangle.setPosition({ 870,890 });
-    rectangle.setFillColor(sf::Color(40, 37, 68));
+    rectangle.setFillColor(sf::Color(25,18,10,210));
+    rectangle.setOutlineThickness({4});
+    rectangle.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text startButton(F, "PLAY", 50);
     startButton.setPosition({ 915.f, 900.f });
-    startButton.setFillColor(sf::Color::Cyan);
+    startButton.setFillColor(sf::Color::White);
 
     //Selection Menu
     sf::RectangleShape rectangle1({ 600,80 });
     rectangle1.setPosition({ 670,990 });
-    rectangle1.setFillColor(sf::Color(40, 37, 68));
+    rectangle1.setFillColor(sf::Color(25,18,10,210));
+    rectangle1.setOutlineThickness({4});
+    rectangle1.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text Settings(F, "BATTLESHIP SELECTION", 50);
     Settings.setPosition({ 730.f,1000.f });
-    Settings.setFillColor(sf::Color::Cyan);
+    Settings.setFillColor(sf::Color::White);
 
     //ExitButton
     sf::RectangleShape rectangle2({ 200,80 });
     rectangle2.setPosition({ 870,1090 });
-    rectangle2.setFillColor(sf::Color(40, 37, 68));
+    rectangle2.setFillColor(sf::Color(25,18,10,210));
+    rectangle2.setOutlineThickness({4});
+    rectangle2.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text exitButton(F, "EXIT", 50);
-    exitButton.setPosition({ 915.f, 1100.f });
-    exitButton.setFillColor(sf::Color::Cyan);
+    exitButton.setPosition({ 925.f, 1100.f });
+    exitButton.setFillColor(sf::Color::White);
 
     //Return to Main Menu Option
     sf::Text backOption(F, "Return", 30);
@@ -297,6 +351,8 @@ int main()
     sf::RectangleShape returnBox({ 120,50 });
     returnBox.setPosition({ 1800,30 });
     returnBox.setFillColor(sf::Color::Red);
+    returnBox.setOutlineThickness({4});
+    returnBox.setOutlineColor(sf::Color::Black);
 
     //selection state
     sf::RectangleShape box1({450,800});
@@ -310,13 +366,6 @@ int main()
     sf::RectangleShape box3({450,800});
     box3.setPosition({1300,400});
     box3.setFillColor(sf::Color(40, 37, 68));
-
-
-
-    //Options
-    // sf::RectangleShape subbox1({420,400});
-    // subbox1.setPosition({310,410});
-    // subbox1.setFillColor(sf::Color(40,37,68));
 
     sf::Sprite option1(texture);
     option1.setScale({1.0f,1.0f});
@@ -384,32 +433,51 @@ int main()
     sf::Texture shipTex3;
     (void)shipTex3.loadFromImage(shipImg3);
 
+    //enemyships changing pics
+    sf::Image enemyImg2;
+    if(!enemyImg2.loadFromFile("enemy(2).png"))
+    {
+        std::cout<<"Unable to load image";
+    }
+    sf::Texture enemy2(enemyImg2);
+
+    sf::Image enemyImg3;
+    if(!enemyImg3.loadFromFile("enemy(3).png"))
+    {
+        std::cout<<"Unable to load image";
+    }
+    sf::Texture enemy3(enemyImg3);
+
     //  Load 2 other biome background textures (itll go back to default if other files arent added)
     sf::Texture biomeTex2;
-    if (!biomeTex2.loadFromFile("biome2.png"))
+    if (!biomeTex2.loadFromFile("Back (1).jpeg"))
         (void)biomeTex2.loadFromFile("spaceback2.png");
 
     sf::Texture biomeTex3;
-    if (!biomeTex3.loadFromFile("biome3.png"))
+    if (!biomeTex3.loadFromFile("Back (3).jpeg"))
         (void)biomeTex3.loadFromFile("spaceback2.png");
 
     //  choose biome button 
     sf::RectangleShape biomeBox({ 430.f, 80.f });
     biomeBox.setPosition({ 765.f, 1090.f });
-    biomeBox.setFillColor(sf::Color(40, 37, 68));
+    biomeBox.setFillColor(sf::Color(25,18,10,210));
+    biomeBox.setOutlineThickness({4});
+    biomeBox.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text biomeButton(F, "MAP SELECTION", 50);
     biomeButton.setPosition({ 805.f, 1100.f });
-    biomeButton.setFillColor(sf::Color::Cyan);
+    biomeButton.setFillColor(sf::Color::White);
 
     // how to play button
     sf::RectangleShape howToPlayBox({ 390.f, 80.f });
     howToPlayBox.setPosition({ 785.f, 1190.f });
-    howToPlayBox.setFillColor(sf::Color(40, 37, 68));
+    howToPlayBox.setFillColor(sf::Color(25,18,10,210));
+    howToPlayBox.setOutlineThickness({4});
+    howToPlayBox.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text howToPlayButton(F, "HOW TO PLAY", 50);
     howToPlayButton.setPosition({ 830.f, 1200.f });
-    howToPlayButton.setFillColor(sf::Color::Cyan);
+    howToPlayButton.setFillColor(sf::Color::White);
 
     // exit button to the last
     rectangle2.setPosition({ 870.f, 1290.f });
@@ -420,11 +488,11 @@ int main()
     muteBox.setPosition({ 50.f, 50.f });
     muteBox.setFillColor(sf::Color::Black);
     muteBox.setOutlineThickness(4.f);
-    muteBox.setOutlineColor(sf::Color::Cyan);
+    muteBox.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text muteButton(F, "SOUND: ON", 32);
     muteButton.setPosition({ 78.f, 62.f });
-    muteButton.setFillColor(sf::Color::Cyan);
+    muteButton.setFillColor(sf::Color::White);
 
     // battleship selection cards 
     sf::RectangleShape shipCard1({ 420.f, 480.f });
@@ -538,7 +606,6 @@ int main()
     sf::Clock clock;
     float speed = 400.f;
 
-
     //Reverse Bullet resources
     sf::Image bullet;
     if(!bullet.loadFromFile("reverse_bullet_image (1).png"))
@@ -559,24 +626,57 @@ int main()
 
     //highest score
     int highest_score = loadHighest();
-
-    sf::Text high(F1, "Highest Score:"+ std::to_string(highest_score), 30);
+    sf::Text h(F,"Highest Score ",25);
+    h.setPosition({50,260});
+    h.setFillColor(sf::Color::White);
+    sf::Text high(F1,std::to_string(highest_score), 40);
     high.setFillColor(sf::Color::Magenta);
-    high.setPosition({ 50.f,260.f });
+    high.setPosition({ 50.f,300.f });
     high.setStyle(sf::Text::Bold | sf::Text::Italic);
 
+    //Time of game
+    sf::Clock time;
+    sf::Text t(F,"Time",35);
+    t.setPosition({50,1450});
+    t.setFillColor(sf::Color::White);
+
+    sf::Text Time(F1,"0",60);
+    Time.setPosition({50,1500});
+    Time.setFillColor(sf::Color::Green);
 
     //health part
     int health = 200;
     int current_score = 0;
-
-    sf::Text healthy(F1,"Health : 200 ",30);
+    
+    sf::Text life(F,"Health",25);
+    life.setPosition({50.f,380.f});
+    life.setFillColor(sf::Color::White);
+    sf::Text healthy(F1,"200",50);
     healthy.setFillColor(sf::Color(255,130,20));
-    healthy.setPosition({50.f,320.f});
+    healthy.setPosition({50.f,420.f});
     healthy.setStyle(sf::Text::Bold | sf::Text::Italic);
+
+    //health point in game
+    sf::Texture HP;
+    if(!HP.loadFromFile("health_button.png"))
+    {
+        std::cout<<"Unable to load image of button";
+    }
+    sf::Sprite hp(HP);
+    // hp.setScale({0.5,0.5});
+
+    //displays health point if hpAvailable is true only
+    bool hpAvailable = false;
+    sf::Clock hpSpawnClock;
+    sf::Clock hpLifetime;
+
+    //Time for life button to exist on the screen
+    float hplife = 10.f;
 
     float enemy_bullet_speed = 500.f;
     float enemy_speed = 300.f;
+
+    bool heart_eff = false;
 
 
     while (window.isOpen())
@@ -612,6 +712,13 @@ int main()
                         currentstate = Gamestate::PLAYING;
                         Menu.stop();
                         Game.play();
+                        time.restart();
+                        totalscore = 0;
+                        scoreText.setString(std::to_string(totalscore));
+                        health = 200;
+                        healthy.setString(std::to_string(health));
+                        lvl.setString("Level One\n Beginner");
+                        lvl.setFillColor(sf::Color::Cyan);
                     }
 
                     if (Settings.getGlobalBounds().contains(clickPos))
@@ -630,14 +737,26 @@ int main()
 
                 if (currentstate == Gamestate::PLAYING)
                 {
+                    Game.play();
                     if (backOption.getGlobalBounds().contains(clickPos))
                     {
                         currentstate = Gamestate::MENU;
                         Menu.play();
                         Game.stop();
-                        enemybullets.clear();
-                        
+                        enemybullets.clear();  
                     }
+                    //Heart beat effect
+                    if(health<50)
+                    {
+                        Heart.play();
+                        Game.stop();
+                    }
+                    else
+                    {
+                        Heart.stop();
+                        Game.play();
+                    }
+                    
                 }
 
                 if (currentstate == Gamestate::SETTINGS)
@@ -658,6 +777,10 @@ int main()
                         Menu.setVolume(0.f);
                         Game.setVolume(0.f);
                         sound.setVolume(0.f);
+                        life_voice.setVolume(0.f);
+                        Heart.setVolume(0.f);
+                        crash.setVolume(0.f);
+                        hitting.setVolume(0.f);
                         muteButton.setString("SOUND: OFF");
                         muteButton.setFillColor(sf::Color::Red);
                         muteBox.setOutlineColor(sf::Color::Red);
@@ -667,11 +790,16 @@ int main()
                         Menu.setVolume(100.f);
                         Game.setVolume(50.f);
                         sound.setVolume(100.f);
+                        Heart.setVolume(400.f);
+                        hitting.setVolume(150.f);
+                        crash.setVolume(150.f);
+                        life_voice.setVolume(400.f);
                         muteButton.setString("SOUND: ON");
-                        muteButton.setFillColor(sf::Color::Cyan);
-                        muteBox.setOutlineColor(sf::Color::Cyan);
+                        muteButton.setFillColor(sf::Color::White);
+                        muteBox.setOutlineColor(sf::Color(255,200,0));
                     }
                 }
+                
 
                 // main menu clicks for biome and tutorial 
                 // if (prevState == Gamestate::MENU && currentstate == Gamestate::MENU)
@@ -713,13 +841,14 @@ int main()
                     if (muteBox.getGlobalBounds().contains(clickPos))
                     {
                         voice.stop();   
-                         isMuted = !isMuted;
+                        isMuted = !isMuted;
                         if (isMuted)
                        {
                         Menu.setVolume(0.f);
                         Game.setVolume(0.f);
                         sound.setVolume(0.f);
                         voice.setVolume(0.f);
+                        Heart.setVolume(0.f);
                         muteButton.setString("SOUND: OFF");
                         muteButton.setFillColor(sf::Color::Red);
                         muteBox.setOutlineColor(sf::Color::Red);
@@ -730,9 +859,10 @@ int main()
                         Game.setVolume(100.f);
                         sound.setVolume(150.f);
                         voice.setVolume(150.f);
+                        Heart.setVolume(400.f);
                         muteButton.setString("SOUND: ON");
-                        muteButton.setFillColor(sf::Color::Cyan);
-                        muteBox.setOutlineColor(sf::Color::Cyan);
+                        muteButton.setFillColor(sf::Color::White);
+                        muteBox.setOutlineColor(sf::Color(255,200,0));
                        }
                     }
                 }
@@ -787,7 +917,7 @@ int main()
         }
 
 
-
+        bool label=false;
         if (currentstate == Gamestate::PLAYING)
         {
             // Player movement
@@ -840,11 +970,36 @@ int main()
             }
 
                    //enemy spawn after passage of time
-            if (enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)
+            if ((enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)&&(totalscore<=400))
             {
                 Spawnnew(enemies, EnemyTexture, 2000.0f);
                 enemySpawnClock.restart();
             }
+            else if ((enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)&&(totalscore<=800))
+            {
+                Spawnnew(enemies, enemy2, 2000.0f);
+                enemySpawnClock.restart();
+            }
+            else if ((enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)&&(totalscore>800))
+            {
+                Spawnnew(enemies, enemy3, 2000.0f);
+
+                if(totalscore%100==0)
+                {
+                    Spawnnew(enemies, enemy2, 2000.0f);
+                    enemySpawnClock.restart();
+                }
+                else if(totalscore%50==0)
+                {
+                    Spawnnew(enemies, EnemyTexture, 2000.0f);
+                    enemySpawnClock.restart();
+                }
+                enemySpawnClock.restart();
+            }
+
+            
+
+
 
            //player and enemy bullet firng
             for (auto bIt = bullets.begin(); bIt != bullets.end(); )
@@ -857,10 +1012,10 @@ int main()
                     if (bIt->getGlobalBounds().findIntersection(eIt->sprite.getGlobalBounds()))
                     {
                         totalscore += 20;
-                        scoreText.setString("Score: " + std::to_string(totalscore));
+                        scoreText.setString(std::to_string(totalscore));
 
                         int highest = UpdatedHighestvalue(totalscore, highest_score);
-                        high.setString("Highest Score: " + std::to_string(highest));
+                        high.setString(std::to_string(highest));
 
                         eIt = enemies.erase(eIt); // after fire enemy del
                         bIt = bullets.erase(bIt); 
@@ -911,21 +1066,69 @@ int main()
                 if (it->sprite.getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
                 {
                     health = health-10;
+                    healthy.setString(std::to_string(health));
                     it = enemies.erase(it);
                     crash.play();
                 }
              
-                else if (it->sprite.getPosition().y > 1500.0f)
+                else if (it->sprite.getPosition().y > 1600.0f)
                 {
                     it = enemies.erase(it);
                     health = health - 10;
-                    healthy.setString("Health : " + std::to_string(health));
+                    healthy.setString(std::to_string(health));
                     crash.play();
                 }
                 else
                 {
                     ++it;
                 }
+            }
+            //Calculation of elapsed time
+            float elapsedTime = time.getElapsedTime().asSeconds();
+
+            Time.setString(std::to_string(static_cast<int>(elapsedTime)));
+
+            // Spawn health point every 15 seconds
+            if (!hpAvailable && hpSpawnClock.getElapsedTime().asSeconds() > 10)
+            {
+                HealthPoint(hp,1800.f,1400.f);
+                hpAvailable = true;
+                hpLifetime.restart();
+                hpSpawnClock.restart();
+            }
+            // Collect health point
+            if (hpAvailable && battleship.getGlobalBounds().findIntersection(hp.getGlobalBounds()))
+            {
+                health += 30;
+                if (health > 200)
+                health = 200;
+                healthy.setString(std::to_string(health));
+                life_voice.play();
+                hpAvailable = false;
+                hpSpawnClock.restart();
+                hpLifetime.restart();
+            }
+
+            //removal of hp button after 5 sec
+            if(hpAvailable && hpLifetime.getElapsedTime().asSeconds() > hplife)
+            {
+                hpAvailable = false;
+                hpLifetime.restart();
+                hpSpawnClock.restart();
+            }
+
+            //Heart beat effect
+            if((health<=80)&&(!heart_eff))
+            {
+                Heart.play();
+                // Game.stop();
+                heart_eff = true;
+            }
+            else if(health>80)
+            {
+                Heart.stop();
+                // Game.play();
+                heart_eff = false;
             }
 
              //enemy bulet movement and player intersection
@@ -937,12 +1140,14 @@ int main()
                     currentstate = Gamestate::GAME_OVER;
                     Game.stop();
                     voice.play();
-                    current_score=totalscore;
+                    current_score = totalscore;
                     totalscore=0;
                     health=200;
                     enemy_bullet_speed=500.f;
                     enemy_speed = 300.f;
                     speed = 400.f;
+                    float current_time = elapsedTime;
+                    Heart.stop();
                 }
 
                 if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
@@ -952,7 +1157,7 @@ int main()
                     // bullets.clear();
                     // enemies.clear();
                     health = health-10;
-                    healthy.setString("Health : " + std::to_string(health));
+                    healthy.setString(std::to_string(health));
                     hitting.play();
                 }
                 else if (it->getPosition().y > 1600.f)
@@ -964,17 +1169,33 @@ int main()
                     ++it;
                 }
             }
+            if(totalscore==500)
+            {
+                lvl.setString("Level Two\n Medium");
+                lvl.setFillColor(sf::Color::Green);
+            }
+            if(totalscore==1000)
+            {
+                lvl.setString("Boss Level\nDifficult");
+                lvl.setFillColor(sf::Color::Magenta);
+            }
+            if(totalscore==2000)
+            {
+                lvl.setString("Boss Level\nImpossible");
+                lvl.setFillColor(sf::Color::Red);
+            }
 
-            if (totalscore % 100 == 0)
+            if (totalscore % 200 == 0)
             {
                 enemy_speed += 0.2;
                 enemy_bullet_speed += 0.2;
             }
 
-            if (totalscore % 200 == 0)
+            if (totalscore % 300 == 0)
             {
                 speed += 0.2;
             }
+        
         }
 
         window.clear(sf::Color::Black);
@@ -1015,12 +1236,22 @@ int main()
             {
                 window.draw(eb);
             }
+            if(hpAvailable)
+            {
+                window.draw(hp);
+            }
             window.draw(scoreText);
             window.draw(high);
             window.draw(healthy);
             window.draw(muteBox);
             window.draw(muteButton);
-
+            window.draw(h);
+            window.draw(score);
+            window.draw(life);
+            window.draw(levelbox);
+            window.draw(lvl);
+            window.draw(t);
+            window.draw(Time);
         }
         else if (currentstate == Gamestate::SETTINGS)
         {
