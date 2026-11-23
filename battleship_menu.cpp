@@ -11,10 +11,10 @@
 struct ENemy
 {
     sf::Sprite sprite;
-    float speed = 150.0f; // Pixels per second
+    float speed = 200.0f; // Pixels per second
 
     sf::Clock shootClock;
-    float shootinterval = 1.5f;
+    float shootinterval = 2.0f;
 
     ENemy(const sf::Texture& texture) : sprite(texture)
     {
@@ -340,7 +340,7 @@ int main()
     rectangle2.setOutlineColor(sf::Color(255,200,0));
 
     sf::Text exitButton(F, "EXIT", 50);
-    exitButton.setPosition({ 925.f, 1100.f });
+    exitButton.setPosition({ 950, 1100 });
     exitButton.setFillColor(sf::Color::White);
 
     //Return to Main Menu Option
@@ -367,6 +367,76 @@ int main()
     box3.setPosition({1300,400});
     box3.setFillColor(sf::Color(40, 37, 68));
 
+    //Game Over menu page designing
+
+    sf::RectangleShape gameBox({600,1000});
+    gameBox.setPosition({700,350});
+    gameBox.setFillColor(sf::Color(0, 0, 0, 210));
+    gameBox.setOutlineThickness({7});
+    gameBox.setOutlineColor(sf::Color::Cyan);
+
+    sf::Text Gametext(F,"GAME OVER",100);
+    Gametext.setPosition({760,125});
+    Gametext.setFillColor(sf::Color::White);
+
+    //game over buttons and their texts
+
+    //Total score of the playing game displayed in Game Over Menu
+    sf::Text Current_Score(F1,"0",60);
+    Current_Score.setPosition({955,455});
+    
+    //Total time of the playing game displayed in Game Over Menu
+    sf::Text Current_time(F1,"0",60);
+    Current_time.setPosition({965,645});
+
+    sf::Text G1(F,"Score",60);
+    G1.setPosition({930,370});
+    G1.setFillColor(sf::Color::Red);
+
+    sf::Text G2(F,"Time",70);
+    G2.setPosition({940,560});
+    G2.setFillColor(sf::Color::Red);
+
+    sf::Text G3(F,"PLAY AGAIN",40);
+    G3.setPosition({910,820});
+    G3.setFillColor(sf::Color::Cyan);
+
+    sf::Text G4(F,"MAIN MENU",40);
+    G4.setPosition({910,930});
+    G4.setFillColor(sf::Color::Cyan);
+
+    sf::Text G5(F,"MAP SELECTION",40);
+    G5.setPosition({870,1040});
+    G5.setFillColor(sf::Color::Cyan);
+
+    sf::Text G6(F,"EXIT",40);
+    G6.setPosition({940,1160});
+    G6.setFillColor(sf::Color::Cyan);
+
+    sf::RectangleShape Game1({400,100});
+    Game1.setPosition({800,800});
+    Game1.setFillColor(sf::Color(10,25,60,255));
+    Game1.setOutlineThickness({7});
+    Game1.setOutlineColor(sf::Color::Cyan);
+
+    sf::RectangleShape Game2({400,100});
+    Game2.setPosition({800,910});
+    Game2.setFillColor(sf::Color(10,25,60,255));
+    Game2.setOutlineThickness({7});
+    Game2.setOutlineColor(sf::Color::Cyan);
+
+    sf::RectangleShape Game3({400,100});
+    Game3.setPosition({800,1020});
+    Game3.setFillColor(sf::Color(10,25,60,255));
+    Game3.setOutlineThickness({7});
+    Game3.setOutlineColor(sf::Color::Cyan);
+
+    sf::RectangleShape Game4({400,100});
+    Game4.setPosition({800,1130});
+    Game4.setFillColor(sf::Color(10,25,60,255));
+    Game4.setOutlineThickness({7});
+    Game4.setOutlineColor(sf::Color::Cyan);
+
     sf::Sprite option1(texture);
     option1.setScale({1.0f,1.0f});
     option1.setPosition({200,420});
@@ -380,7 +450,7 @@ int main()
 
     Gamestate currentstate = MENU;
 
-           // scale window to fit the monitor so ui elements are not cut off
+    // scale window to fit the monitor so ui elements are not cut off
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
     if (desktop.size.x < 2050 || desktop.size.y < 1680)
     {
@@ -634,7 +704,7 @@ int main()
     high.setPosition({ 50.f,300.f });
     high.setStyle(sf::Text::Bold | sf::Text::Italic);
 
-    //Time of game
+    //Time of game which will be shown in the game
     sf::Clock time;
     sf::Text t(F,"Time",35);
     t.setPosition({50,1450});
@@ -651,6 +721,7 @@ int main()
     sf::Text life(F,"Health",25);
     life.setPosition({50.f,380.f});
     life.setFillColor(sf::Color::White);
+
     sf::Text healthy(F1,"200",50);
     healthy.setFillColor(sf::Color(255,130,20));
     healthy.setPosition({50.f,420.f});
@@ -831,39 +902,12 @@ int main()
                 //Game Over state
                 if(currentstate == Gamestate::GAME_OVER)
                 {
-                    voice.play();
+                
                     if (backOption.getGlobalBounds().contains(clickPos))
                     {
                         voice.stop();
                         currentstate = Gamestate::MENU;
                         Menu.play();
-                    }
-                    if (muteBox.getGlobalBounds().contains(clickPos))
-                    {
-                        voice.stop();   
-                        isMuted = !isMuted;
-                        if (isMuted)
-                       {
-                        Menu.setVolume(0.f);
-                        Game.setVolume(0.f);
-                        sound.setVolume(0.f);
-                        voice.setVolume(0.f);
-                        Heart.setVolume(0.f);
-                        muteButton.setString("SOUND: OFF");
-                        muteButton.setFillColor(sf::Color::Red);
-                        muteBox.setOutlineColor(sf::Color::Red);
-                       }
-                       else
-                       {
-                        Menu.setVolume(200.f);
-                        Game.setVolume(100.f);
-                        sound.setVolume(150.f);
-                        voice.setVolume(150.f);
-                        Heart.setVolume(400.f);
-                        muteButton.setString("SOUND: ON");
-                        muteButton.setFillColor(sf::Color::White);
-                        muteBox.setOutlineColor(sf::Color(255,200,0));
-                       }
                     }
                 }
 
@@ -1074,7 +1118,7 @@ int main()
                 else if (it->sprite.getPosition().y > 1600.0f)
                 {
                     it = enemies.erase(it);
-                    health = health - 10;
+                    health = health - 100;
                     healthy.setString(std::to_string(health));
                     crash.play();
                 }
@@ -1121,34 +1165,35 @@ int main()
             if((health<=80)&&(!heart_eff))
             {
                 Heart.play();
-                // Game.stop();
                 heart_eff = true;
             }
             else if(health>80)
             {
                 Heart.stop();
-                // Game.play();
                 heart_eff = false;
+            }
+
+            if(health<=0)
+            {
+                currentstate = Gamestate::GAME_OVER;
+                Game.stop();
+                voice.play();
+                current_score = totalscore;
+                totalscore=0;
+                health=200;
+                enemy_bullet_speed=500.f;
+                enemy_speed = 300.f;
+                speed = 400.f;
+                float current_time = elapsedTime;
+                Current_Score.setString(std::to_string(current_score));
+                Current_time.setString(std::to_string(current_time));
+                Heart.stop();
             }
 
              //enemy bulet movement and player intersection
             for (auto it = enemybullets.begin(); it != enemybullets.end(); )
             {
                 it->move({ 0.f, enemy_bullet_speed* dt });
-                if(health<=0)
-                {
-                    currentstate = Gamestate::GAME_OVER;
-                    Game.stop();
-                    voice.play();
-                    current_score = totalscore;
-                    totalscore=0;
-                    health=200;
-                    enemy_bullet_speed=500.f;
-                    enemy_speed = 300.f;
-                    speed = 400.f;
-                    float current_time = elapsedTime;
-                    Heart.stop();
-                }
 
                 if (it->getGlobalBounds().findIntersection(battleship.getGlobalBounds()))
                 {
@@ -1156,7 +1201,7 @@ int main()
                     // enemybullets.clear();
                     // bullets.clear();
                     // enemies.clear();
-                    health = health-10;
+                    health = health-100;
                     healthy.setString(std::to_string(health));
                     hitting.play();
                 }
@@ -1337,7 +1382,6 @@ int main()
                 window.draw(howToBody);
             }
 
-
             window.draw(muteBox);
             window.draw(muteButton);
         }
@@ -1346,8 +1390,22 @@ int main()
             window.draw(End);
             window.draw(returnBox);
             window.draw(backOption);
-            window.draw(muteBox);
-            window.draw(muteButton);
+            // window.draw(muteBox);
+            // window.draw(muteButton);
+            window.draw(gameBox);
+            window.draw(Gametext);
+            window.draw(G1);
+            window.draw(G2);
+            window.draw(Game1);
+            window.draw(G3);
+            window.draw(Game2);
+            window.draw(G4);
+            window.draw(Game3);
+            window.draw(G5);
+            window.draw(Game4);
+            window.draw(G6);
+            window.draw(Current_Score);
+            window.draw(Current_time);
         }
 
         window.display();
