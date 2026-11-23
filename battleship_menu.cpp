@@ -26,11 +26,6 @@ struct ENemy
 void SpawnEnemies(ENemy& enemy, float windowWidth)
 {
     sf::FloatRect bounds = enemy.sprite.getGlobalBounds();
-    // float enemyWidth = bounds.size.x;
-    // float enemyHeight = bounds.size.y;
-    // float max = windowWidth - enemyWidth;
-    // if (max <= 1.0f) max = 1.0f;
-    // float random = static_cast<float>(std::rand() % static_cast<int>(max));
     float position[10][2]={{30.f,0},{230.f,0},{430.f,0},{630.f,0},{830,0},{1030,0},{1230,0},{1430,0},{1700,0},{1930,0}};
     int random = std::rand() % 10;
     enemy.sprite.setPosition({position[random][0], 0.f});
@@ -51,7 +46,26 @@ void HealthPoint(sf::Sprite &point, float windowWidth, float windowHeight)
    {
     random = random + 120;
    }
-   point.setScale({0.3,0.3});
+   point.setScale({0.27,0.27});
+   point.setPosition({random,random1});
+}
+
+void BonusCoin(sf::Sprite &point, float windowWidth, float windowHeight)
+{
+   sf::FloatRect bound = point.getGlobalBounds();
+   float max_width = windowWidth - 200- bound.size.x;
+   float max_height = windowHeight -300-bound.size.y;
+   float random = std::rand()%((int)max_width);
+   float random1 = std::rand()%((int)max_height);
+   if(random1<200)
+   {
+    random1 = random1 + 120;
+   }
+   if(random<200)
+   {
+    random = random + 120;
+   }
+   point.setScale({0.25,0.25});
    point.setPosition({random,random1});
 }
 
@@ -212,6 +226,15 @@ int main()
         Heart.setVolume(400.f);
     }
 
+    //Coin Receiving sound
+    sf::SoundBuffer Coins;
+    if(!Coins.loadFromFile("Coin_gain.mp3"))
+    {
+        std::cout<<"Unable to load coin voice";
+    }
+    sf::Sound Coin_gain(Coins);
+    Coin_gain.setVolume(400);
+
     //Life gaining buffer sound
     sf::SoundBuffer Life;
     if(!Life.loadFromFile("life_voice.mp3"))
@@ -371,47 +394,47 @@ int main()
 
     sf::RectangleShape gameBox({600,1000});
     gameBox.setPosition({700,350});
-    gameBox.setFillColor(sf::Color(0, 0, 0, 210));
+    gameBox.setFillColor(sf::Color(10,15,26,217));
     gameBox.setOutlineThickness({7});
-    gameBox.setOutlineColor(sf::Color::Cyan);
+    gameBox.setOutlineColor(sf::Color(0,229,255));
 
     sf::Text Gametext(F,"GAME OVER",100);
     Gametext.setPosition({760,125});
-    Gametext.setFillColor(sf::Color::White);
+    Gametext.setFillColor(sf::Color(255,255,255));
 
     //game over buttons and their texts
 
     //Total score of the playing game displayed in Game Over Menu
     sf::Text Current_Score(F1,"0",60);
-    Current_Score.setPosition({955,455});
+    Current_Score.setPosition({945,455});
     
     //Total time of the playing game displayed in Game Over Menu
     sf::Text Current_time(F1,"0",60);
-    Current_time.setPosition({965,645});
+    Current_time.setPosition({870,645});
 
     sf::Text G1(F,"Score",60);
     G1.setPosition({930,370});
-    G1.setFillColor(sf::Color::Red);
+    G1.setFillColor(sf::Color(0,229,255));
 
     sf::Text G2(F,"Time",70);
     G2.setPosition({940,560});
-    G2.setFillColor(sf::Color::Red);
+    G2.setFillColor(sf::Color(0,229,255));
 
     sf::Text G3(F,"PLAY AGAIN",40);
     G3.setPosition({910,820});
-    G3.setFillColor(sf::Color::Cyan);
+    G3.setFillColor(sf::Color(176,190,197));
 
     sf::Text G4(F,"MAIN MENU",40);
     G4.setPosition({910,930});
-    G4.setFillColor(sf::Color::Cyan);
+    G4.setFillColor(sf::Color(176,190,197));
 
     sf::Text G5(F,"MAP SELECTION",40);
     G5.setPosition({870,1040});
-    G5.setFillColor(sf::Color::Cyan);
+    G5.setFillColor(sf::Color(176,190,197));
 
     sf::Text G6(F,"EXIT",40);
-    G6.setPosition({940,1160});
-    G6.setFillColor(sf::Color::Cyan);
+    G6.setPosition({950,1160});
+    G6.setFillColor(sf::Color(176,190,197));
 
     sf::RectangleShape Game1({400,100});
     Game1.setPosition({800,800});
@@ -734,11 +757,26 @@ int main()
         std::cout<<"Unable to load image of button";
     }
     sf::Sprite hp(HP);
-    // hp.setScale({0.5,0.5});
+    
+    //Bonus Coin point
+    sf::Texture CP;  //Coin Point
+    if(!CP.loadFromFile("Coin.png"))
+    {
+        std::cout<<"Unable to load image of coin";
+    }
+    sf::Sprite Coin(CP);
+    
+    //Displays Coin point if coinAvailable = true only
+    int CoinAvailable = false;
+    //This clock tells us the time after which another coin point will appear on the screen
+    sf::Clock Coinspawn;
+    sf::Clock CoinLife;
 
     //displays health point if hpAvailable is true only
     bool hpAvailable = false;
+    //This clock tells us the time after which another hp point will apper on the screen
     sf::Clock hpSpawnClock;
+    //This clock tells us the time after which the appeared hp point will disappear
     sf::Clock hpLifetime;
 
     //Time for life button to exist on the screen
@@ -814,7 +852,8 @@ int main()
                         currentstate = Gamestate::MENU;
                         Menu.play();
                         Game.stop();
-                        enemybullets.clear();  
+                        enemybullets.clear(); 
+                        Heart.stop();
                     }
                     //Heart beat effect
                     if(health<50)
@@ -902,12 +941,32 @@ int main()
                 //Game Over state
                 if(currentstate == Gamestate::GAME_OVER)
                 {
-                
-                    if (backOption.getGlobalBounds().contains(clickPos))
+                    if(Game1.getGlobalBounds().contains(clickPos))
                     {
-                        voice.stop();
+                        currentstate = Gamestate::PLAYING;
+                        Game.play();
+                        time.restart();
+                        totalscore = 0;
+                        scoreText.setString(std::to_string(totalscore));
+                        health = 200;
+                        healthy.setString(std::to_string(health));
+                        lvl.setString("Level One\n Beginner");
+                        lvl.setFillColor(sf::Color::Cyan);
+                    }
+                    else if(Game2.getGlobalBounds().contains(clickPos))
+                    {
                         currentstate = Gamestate::MENU;
                         Menu.play();
+                    }
+                    else if(Game3.getGlobalBounds().contains(clickPos))
+                    {
+                        customScreen = 1;
+                        currentstate = Gamestate::SETTINGS;
+                        Menu.play();
+                    }
+                    else if(Game4.getGlobalBounds().contains(clickPos))
+                    {
+                        window.close();
                     }
                 }
 
@@ -994,6 +1053,8 @@ int main()
                 }
             }
 
+
+
             // Firing
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
             {
@@ -1013,7 +1074,7 @@ int main()
                 }
             }
 
-                   //enemy spawn after passage of time
+            //enemy spawn after passage of time
             if ((enemySpawnClock.getElapsedTime().asSeconds() > 1.8f && enemies.size() < 4)&&(totalscore<=400))
             {
                 Spawnnew(enemies, EnemyTexture, 2000.0f);
@@ -1040,10 +1101,6 @@ int main()
                 }
                 enemySpawnClock.restart();
             }
-
-            
-
-
 
            //player and enemy bullet firng
             for (auto bIt = bullets.begin(); bIt != bullets.end(); )
@@ -1118,7 +1175,7 @@ int main()
                 else if (it->sprite.getPosition().y > 1600.0f)
                 {
                     it = enemies.erase(it);
-                    health = health - 100;
+                    health = health - 10;
                     healthy.setString(std::to_string(health));
                     crash.play();
                 }
@@ -1132,7 +1189,7 @@ int main()
 
             Time.setString(std::to_string(static_cast<int>(elapsedTime)));
 
-            // Spawn health point every 15 seconds
+            // Spawn health point every 10 seconds
             if (!hpAvailable && hpSpawnClock.getElapsedTime().asSeconds() > 10)
             {
                 HealthPoint(hp,1800.f,1400.f);
@@ -1173,6 +1230,34 @@ int main()
                 heart_eff = false;
             }
 
+            //spawn coins after 15 seconds
+            if(!CoinAvailable && Coinspawn.getElapsedTime().asSeconds() > 5)
+            {
+                CoinAvailable = true;
+                BonusCoin(Coin,1800.f,1400.f);
+                CoinLife.restart();
+                Coinspawn.restart();
+            }
+            //Collection of Bonus Coins
+            if(CoinAvailable && battleship.getGlobalBounds().findIntersection(Coin.getGlobalBounds()))
+            {
+                Coin_gain.play();
+                totalscore += 10;
+                scoreText.setString(std::to_string(totalscore));
+                CoinAvailable = false;
+                CoinLife.restart();
+                Coinspawn.restart();
+            }
+            //removal of coin after 15 seconds
+            if(CoinAvailable && CoinLife.getElapsedTime().asSeconds()>15)
+            {
+                CoinAvailable = false;
+                CoinLife.restart();
+                Coinspawn.restart();
+            }
+
+
+            //Re-initializing of each element
             if(health<=0)
             {
                 currentstate = Gamestate::GAME_OVER;
@@ -1201,7 +1286,7 @@ int main()
                     // enemybullets.clear();
                     // bullets.clear();
                     // enemies.clear();
-                    health = health-100;
+                    health = health-5;
                     healthy.setString(std::to_string(health));
                     hitting.play();
                 }
@@ -1248,7 +1333,6 @@ int main()
         if (currentstate == Gamestate::MENU)
         {
             window.draw(backs);
-            // window.draw(text);
             window.draw(rectangle);
             window.draw(startButton);
             window.draw(rectangle1);
@@ -1284,6 +1368,10 @@ int main()
             if(hpAvailable)
             {
                 window.draw(hp);
+            }
+            if(CoinAvailable)
+            {
+                window.draw(Coin);
             }
             window.draw(scoreText);
             window.draw(high);
@@ -1374,7 +1462,6 @@ int main()
             else if (customScreen == 2)
             {
 
-                // window.draw(backs);
                 window.draw(returnBox);
                 window.draw(backOption);
                 window.draw(howToTitle);
@@ -1388,10 +1475,6 @@ int main()
         else if(currentstate == Gamestate::GAME_OVER)
         {
             window.draw(End);
-            window.draw(returnBox);
-            window.draw(backOption);
-            // window.draw(muteBox);
-            // window.draw(muteButton);
             window.draw(gameBox);
             window.draw(Gametext);
             window.draw(G1);
@@ -1407,7 +1490,6 @@ int main()
             window.draw(Current_Score);
             window.draw(Current_time);
         }
-
         window.display();
     }
 
